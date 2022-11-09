@@ -4,6 +4,7 @@ import {
     Form,
     Input,
 } from 'reactstrap';
+import SessionManager from "./SessionManager";
 
 
 export class StartPage extends Component {
@@ -19,34 +20,16 @@ export class StartPage extends Component {
             isSignUp: false
         }
 
-        this.onEmailChange = this.onEmailChange.bind(this);
-        this.onPasswordChange = this.onPasswordChange.bind(this);
-        this.onFirstNameChange = this.onFirstNameChange.bind(this);
-        this.onLastNameChange = this.onLastNameChange.bind(this);
-        this.onUserTypeChange = this.onUserTypeChange.bind(this);
+        this.onChange = this.onChange.bind(this);
+
         this.onSignUpClick = this.onSignUpClick.bind(this);
+
         this.login = this.login.bind(this);
         this.signUp = this.signUp.bind(this);
     }
 
-    onEmailChange(e) {
-        this.setState({ email: e.target.value });
-    }
-
-    onPasswordChange(e) {
-        this.setState({ password: e.target.value });
-    }
-
-    onFirstNameChange(e) {
-        this.setState({ firstName: e.target.value });
-    }
-
-    onLastNameChange(e) {
-        this.setState({ lastName: e.target.value });
-    }
-
-    onUserTypeChange(e) {
-        this.setState({ userType: e.target.value });
+    onChange(e) {
+        this.setState({ [e.target.name]: e.target.value });
     }
 
     onSignUpClick(e) {
@@ -78,12 +61,16 @@ export class StartPage extends Component {
         }).then((Response) => Response.json())
             .then((result) => {
                 console.log(result);
-                if (result.status === "Failure") {
-                    localStorage.setItem("authenticated", false);
+                if (result?.token != null) {
+
+                    SessionManager.setUserSession(result.token, result.userEmail, result.usersRole)
+
+                    if (SessionManager.getToken() != null) {
+                        window.location.href = "/home";
+                    }
                 }
                 else {
-                    localStorage.setItem("authenticated", true);
-                    this.props.history.push("/dashboard");
+                    alert("Invalid Email or Password");
                 }
             });
     }
@@ -110,7 +97,21 @@ export class StartPage extends Component {
                 LastName: this.state.lastName,
                 UserType: this.state.userType.charAt(0)
             })
-        }).then(() => console.log("user added"));
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log(result);
+                if (result?.token != null) {
+
+                    SessionManager.setUserSession(result.token, result.userEmail, result.usersRole)
+
+                    if (SessionManager.getToken() != null) {
+                        window.location.href = "/home";
+                    }
+                }
+                else {
+                    alert("Error adding user");
+                }
+            });
     }
 
     render() {
@@ -120,32 +121,32 @@ export class StartPage extends Component {
                 <h1>Mechanic's Mate</h1>
                 <Form>
                     <Input
-                        id='email'
+                        name='email'
                         placeholder='Email'
                         type='email'
-                        onChange={this.onEmailChange} />
+                        onChange={this.onChange} />
                     <Input
-                        id='password'
+                        name='password'
                         placeholder='Password'
                         type='password'
-                        onChange={this.onPasswordChange} />
+                        onChange={this.onChange} />
                     {this.state.isSignUp === true &&
                         <Input
-                            id='firstname'
+                            name='firstName'
                             placeholder='First Name'
                             type='text'
-                            onChange={this.onFirstNameChange} />}
+                            onChange={this.onChange} />}
                     {this.state.isSignUp === true &&
                         <Input
-                            id='lastname'
+                            name='lastName'
                             placeholder='Last Name'
                             type='text'
-                            onChange={this.onLastNameChange} />}
+                            onChange={this.onChange} />}
                     {this.state.isSignUp === true &&
                         <Input
-                            id='usertype'
+                            name='userType'
                             type='select'
-                            onChange={this.onUserTypeChange} >
+                            onChange={this.onChange} >
                             <option>
                                 Owner
                             </option>
@@ -153,10 +154,12 @@ export class StartPage extends Component {
                                 Service Provider
                             </option>
                         </Input>}
+                    <br/>
                     <Button
                         onClick={this.login}>
                         Log In
                     </Button>
+                    &nbsp;
                     <Button
                         onClick={this.onSignUpClick}>
                         Sign Up
