@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import SessionManager from "./Auth/SessionManager";
 
 export class FetchData extends Component {
   static displayName = FetchData.name;
@@ -52,7 +53,15 @@ export class FetchData extends Component {
   }
 
   async populateWeatherData() {
-    const response = await fetch('api/weatherforecast');
+      const response = await fetch('api/weatherforecast', {
+          method: 'GET',
+          headers: {
+              "access-control-allow-origin": "*",
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + SessionManager.getToken()
+          }
+      });
     const data = await response.json();
     this.setState({ forecasts: data, loading: false });
   }
