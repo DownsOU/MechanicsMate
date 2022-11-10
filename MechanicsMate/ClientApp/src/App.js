@@ -10,6 +10,8 @@ import { AddService } from './components/Service/AddService'
 import SessionManager from "./components/Auth/SessionManager";
 import './custom.css'
 
+//this is a comment to test git
+
 export default class App extends Component {
     static displayName = App.name;
 
