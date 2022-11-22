@@ -6,13 +6,15 @@
         else return null;
     },
 
-    setUserSession(token, userEmail, userType) {
+    setUserSession(token, userId, userEmail, userType) {
+        sessionStorage.setItem('userId', userId);
         sessionStorage.setItem('userEmail', userEmail);
         sessionStorage.setItem('token', token);
         sessionStorage.setItem('userType', userType);
     },
 
     removeUserSession() {
+        sessionStorage.removeItem('userId');
         sessionStorage.removeItem('userEmail');
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('userType');

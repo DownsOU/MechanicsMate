@@ -9,6 +9,7 @@ namespace MechanicsMateBackend.Models.VM
     public class UserResponse
     {
         public string Status { get; set; }
+        public int UserId { get; set; }
         public string UserEmail { get; set; }
         public string UserType { get; set; }
         public string Token { get; set; }
