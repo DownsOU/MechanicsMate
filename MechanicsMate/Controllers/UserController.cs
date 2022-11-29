@@ -50,5 +50,13 @@ namespace MechanicsMate.Controllers
             await us.DeleteCurrentUser(emailObj.email);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost]
+        [Route("RequestUserAccess")]
+        public async Task RequestUserAccess([FromBody] AccessRequest request)
+        {
+            var us = new UserService();
+            await us.RequestUserAccess(request);
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace MechanicsMateBackend.Models
         public ulong VehicleInfoId { get; set; }
         public uint Mileage { get; set; }
         public uint? DrivingHabit { get; set; }
+        public string Vin { get; set; }
 
         public virtual User Owner { get; set; }
         public virtual Mg1nYearMakeModelMasterAdvanced VehicleInfo { get; set; }

@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace MechanicsMateBackend.Models
 {
-    public partial class MechanicsMateEntities : DbContext
+    public partial class mechanics_mate_devContext : DbContext
     {
-        public MechanicsMateEntities()
+        public mechanics_mate_devContext()
         {
         }
 
-        public MechanicsMateEntities(DbContextOptions<MechanicsMateEntities> options)
+        public mechanics_mate_devContext(DbContextOptions<mechanics_mate_devContext> options)
             : base(options)
         {
         }
@@ -20,13 +20,14 @@ namespace MechanicsMateBackend.Models
         public virtual DbSet<ServiceLog> ServiceLogs { get; set; }
         public virtual DbSet<ServiceType> ServiceTypes { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserAccess> UserAccesses { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("server=mechanics-mate.cc6ruxrhlzww.us-east-2.rds.amazonaws.com;database=mechanics_mate_dev;user=admin;password=mechanic123", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.28-mysql"));
+                optionsBuilder.UseMySql("server=mechanics-mate.cc6ruxrhlzww.us-east-2.rds.amazonaws.com,3306;database=mechanics_mate_dev;user=admin;password=mechanic123", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.28-mysql"));
             }
         }
 
@@ -141,6 +142,9 @@ namespace MechanicsMateBackend.Models
             {
                 entity.ToTable("User");
 
+                entity.HasIndex(e => e.Email, "Email")
+                    .IsUnique();
+
                 entity.Property(e => e.Email).HasMaxLength(100);
 
                 entity.Property(e => e.FirstName).HasMaxLength(50);
@@ -152,13 +156,41 @@ namespace MechanicsMateBackend.Models
                 entity.Property(e => e.UserType).HasMaxLength(1);
             });
 
+            modelBuilder.Entity<UserAccess>(entity =>
+            {
+                entity.ToTable("UserAccess");
+
+                entity.HasIndex(e => e.ServiceProviderId, "ServiceProviderId");
+
+                entity.HasIndex(e => e.VehicleOwnerId, "VehicleOwnerId");
+
+                entity.HasOne(d => d.ServiceProvider)
+                    .WithMany(p => p.UserAccessServiceProviders)
+                    .HasForeignKey(d => d.ServiceProviderId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("UserAccess_ibfk_1");
+
+                entity.HasOne(d => d.VehicleOwner)
+                    .WithMany(p => p.UserAccessVehicleOwners)
+                    .HasForeignKey(d => d.VehicleOwnerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("UserAccess_ibfk_2");
+            });
+
             modelBuilder.Entity<Vehicle>(entity =>
             {
                 entity.ToTable("Vehicle");
 
                 entity.HasIndex(e => e.OwnerId, "OwnerId");
 
+                entity.HasIndex(e => e.Vin, "VIN")
+                    .IsUnique();
+
                 entity.HasIndex(e => e.VehicleInfoId, "VehicleInfoId");
+
+                entity.Property(e => e.Vin)
+                    .HasMaxLength(17)
+                    .HasColumnName("VIN");
 
                 entity.HasOne(d => d.Owner)
                     .WithMany(p => p.Vehicles)

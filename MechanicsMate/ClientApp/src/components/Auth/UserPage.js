@@ -86,6 +86,11 @@ export class UserPage extends Component {
                     <p>{this.state.user.userType === 'S' ? "Service Provider" : "Vehicle Owner"}</p>
                 </div>
                 <br />
+                {this.state.user.userType === 'S' &&
+                    <input type='button' href='auth/requestaccess'>
+                        Request User Vehicle Access
+                    </input>
+                }
                 <Button
                     onClick={this.logOut}>
                     Log Out

@@ -8,6 +8,8 @@ namespace MechanicsMateBackend.Models
         public User()
         {
             ServiceLogs = new HashSet<ServiceLog>();
+            UserAccessServiceProviders = new HashSet<UserAccess>();
+            UserAccessVehicleOwners = new HashSet<UserAccess>();
             Vehicles = new HashSet<Vehicle>();
         }
 
@@ -19,6 +21,8 @@ namespace MechanicsMateBackend.Models
         public string UserType { get; set; }
 
         public virtual ICollection<ServiceLog> ServiceLogs { get; set; }
+        public virtual ICollection<UserAccess> UserAccessServiceProviders { get; set; }
+        public virtual ICollection<UserAccess> UserAccessVehicleOwners { get; set; }
         public virtual ICollection<Vehicle> Vehicles { get; set; }
     }
 }
