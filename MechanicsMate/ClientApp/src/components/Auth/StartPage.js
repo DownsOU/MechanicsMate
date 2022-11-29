@@ -63,7 +63,7 @@ export class StartPage extends Component {
                 console.log(result);
                 if (result?.token != null) {
 
-                    SessionManager.setUserSession(result.token, result.userEmail, result.usersRole)
+                    SessionManager.setUserSession(result.token, result.userId, result.userEmail, result.usersRole)
 
                     if (SessionManager.getToken() != null) {
                         window.location.href = "/home";
@@ -72,6 +72,7 @@ export class StartPage extends Component {
                 else {
                     alert("Invalid Email or Password");
                 }
+                console.log(sessionStorage.getItem('userId'));
             });
     }
 
@@ -102,7 +103,7 @@ export class StartPage extends Component {
                 console.log(result);
                 if (result?.token != null) {
 
-                    SessionManager.setUserSession(result.token, result.userEmail, result.usersRole)
+                    SessionManager.setUserSession(result.token, result.userId, result.userEmail, result.usersRole)
 
                     if (SessionManager.getToken() != null) {
                         window.location.href = "/home";

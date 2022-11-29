@@ -13,7 +13,7 @@ namespace MechanicsMateBackend.Services
     {
         public async Task<UserResponse> AddUser(UserCreate userCreate)
         {
-            using (var mme = new MechanicsMateEntities())
+            using (var mmd = new mechanics_mate_devContext())
             {
                 var user = new User();
                 var hasher = new PasswordHasher();
@@ -22,8 +22,8 @@ namespace MechanicsMateBackend.Services
                 user.FirstName = userCreate.FirstName;
                 user.LastName = userCreate.LastName;
                 user.UserType = userCreate.UserType;
-                mme.Users.Add(user);
-                await mme.SaveChangesAsync();
+                mmd.Users.Add(user);
+                await mmd.SaveChangesAsync();
                 var tokenGen = new TokenGenerator(
                             "THISISTHETOKENKEY",
                             "jwt",
@@ -34,6 +34,7 @@ namespace MechanicsMateBackend.Services
                 return new UserResponse
                 {
                     Status = "Success",
+                    UserId = user.UserId,
                     UserEmail = user.Email,
                     UserType = user.UserType,
                     Token = token
@@ -43,9 +44,9 @@ namespace MechanicsMateBackend.Services
         
         public async Task<UserResponse> LoginUser(UserLogin userLogin)
         {
-            using (var mme = new MechanicsMateEntities())
+            using (var mmd = new mechanics_mate_devContext())
             {
-                var user = await mme.Users.Where(u => u.Email == userLogin.Email).FirstOrDefaultAsync();
+                var user = await mmd.Users.Where(u => u.Email == userLogin.Email).FirstOrDefaultAsync();
                 if (user == null)
                 {
                     throw new ApplicationException("User not found");
@@ -69,6 +70,7 @@ namespace MechanicsMateBackend.Services
                         return new UserResponse
                         {
                             Status = "Success",
+                            UserId = user.UserId,
                             UserEmail = user.Email,
                             UserType = user.UserType,
                             Token = token
@@ -80,9 +82,9 @@ namespace MechanicsMateBackend.Services
 
         public async Task<UserDetail> GetCurrentUserDetails(string email)
         {
-            using (var mme = new MechanicsMateEntities())
+            using (var mmd = new mechanics_mate_devContext())
             {
-                var user = await mme.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+                var user = await mmd.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
                 return new UserDetail
                 {
                     UserId = user.UserId,
@@ -96,11 +98,57 @@ namespace MechanicsMateBackend.Services
 
         public async Task DeleteCurrentUser(string email)
         {
-            using (var mme = new MechanicsMateEntities())
+            using (var mmd = new mechanics_mate_devContext())
             {
-                var user = await mme.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
-                mme.Users.Remove(user);
-                await mme.SaveChangesAsync();
+                var user = await mmd.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+                mmd.Users.Remove(user);
+                await mmd.SaveChangesAsync();
+            }
+        }
+
+        public async Task RequestUserAccess(AccessRequest request)
+        {
+            using (var mmd = new mechanics_mate_devContext())
+            {
+                var requestedUser = await mmd.Users.Where(u => u.Email == request.RequestedUserEmail).FirstOrDefaultAsync();
+                if(requestedUser == null)
+                {
+                    throw new ApplicationException("User not found");
+                }
+                var requestedUserId = requestedUser.UserId;
+                mmd.UserAccesses.Add(new UserAccess
+                {
+                    ServiceProviderId = request.RequestorUserId,
+                    VehicleOwnerId = requestedUserId,
+                    RequestStatus = (int)RequestStatus.Pending,
+                });
+                await mmd.SaveChangesAsync();
+            }
+        }
+
+        public async Task ApproveOrRejectUserAccess(ApproveRejectAccess arAccess)
+        {
+            using (var mmd = new mechanics_mate_devContext())
+            {
+                var userAccess = await mmd.UserAccesses.Where(ua => ua.ServiceProviderId == arAccess.ServiceProviderId && ua.VehicleOwnerId == arAccess.OwnerId).FirstOrDefaultAsync();
+                if (arAccess.ApproveReject == "Approve")
+                {
+                    userAccess.RequestStatus = (int)RequestStatus.Accepted;
+                    return;
+                }
+                if (arAccess.ApproveReject == "Reject")
+                {
+                    userAccess.RequestStatus = (int)RequestStatus.Rejected;
+                    return;
+                }
+            }
+        }
+
+        public async Task<List<UserAccess>> GetPendingRequests(int userId)
+        {
+            using (var mmd = new mechanics_mate_devContext())
+            {
+                return await mmd.UserAccesses.Where(ua => ua.VehicleOwnerId == userId && ua.RequestStatus == (int)RequestStatus.Pending).ToListAsync();
             }
         }
     }
