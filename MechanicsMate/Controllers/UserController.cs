@@ -58,5 +58,21 @@ namespace MechanicsMate.Controllers
             var us = new UserService();
             await us.RequestUserAccess(request);
         }
+
+        [HttpGet]
+        [Route("GetPendingRequests")]
+        public async Task<List<PendingRequest>> GetPendingRequests(int userId)
+        {
+            var us = new UserService();
+            return await us.GetPendingRequests(userId);
+        }
+
+        [HttpGet]
+        [Route("GetServiceProviderList")]
+        public async Task<List<UserDetail>> GetServiceProviderList()
+        {
+            var us = new UserService();
+            return await us.GetServiceProviderList();
+        }
     }
 }

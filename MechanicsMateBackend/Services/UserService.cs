@@ -111,6 +111,7 @@ namespace MechanicsMateBackend.Services
             using (var mmd = new mechanics_mate_devContext())
             {
                 var requestedUser = await mmd.Users.Where(u => u.Email == request.RequestedUserEmail).FirstOrDefaultAsync();
+                var emailList = await mmd.Users.Select(u => u.Email).Distinct().ToListAsync();
                 if(requestedUser == null)
                 {
                     throw new ApplicationException("User not found");
@@ -144,11 +145,44 @@ namespace MechanicsMateBackend.Services
             }
         }
 
-        public async Task<List<UserAccess>> GetPendingRequests(int userId)
+        public async Task<List<PendingRequest>> GetPendingRequests(int userId)
         {
             using (var mmd = new mechanics_mate_devContext())
             {
-                return await mmd.UserAccesses.Where(ua => ua.VehicleOwnerId == userId && ua.RequestStatus == (int)RequestStatus.Pending).ToListAsync();
+                var pendingRequestList = new List<PendingRequest>();
+                var requestsFromDB = await mmd.UserAccesses.Where(ua => ua.VehicleOwnerId == userId && ua.RequestStatus == (int)RequestStatus.Pending)
+                    .Include(ua => ua.ServiceProvider).ToListAsync();
+                foreach(var request in requestsFromDB)
+                {
+                    pendingRequestList.Add(new PendingRequest
+                    {
+                        ServiceProviderId = request.ServiceProviderId,
+                        VehicleOwnerID = request.VehicleOwnerId,
+                        ServiceProviderName = request.ServiceProvider.FirstName + " " +request.ServiceProvider.LastName
+                    });
+                }
+                return pendingRequestList;
+            }
+        }
+
+        public async Task<List<UserDetail>> GetServiceProviderList()
+        {
+            using (var mmd = new mechanics_mate_devContext())
+            {
+                var providerList = new List<UserDetail>();
+                var userList = await mmd.Users.Where(u => u.UserType == "S").ToListAsync();
+                foreach (var user in userList)
+                {
+                    providerList.Add(new UserDetail
+                    {
+                        UserId = user.UserId,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        UserType = user.UserType,
+                    });
+                }
+                return providerList;
             }
         }
     }

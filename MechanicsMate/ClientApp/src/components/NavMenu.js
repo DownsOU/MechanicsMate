@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import './NavMenu.css';
+import SessionManager from "./Auth/SessionManager";
+
 
 export class NavMenu extends Component {
     static displayName = NavMenu.name;
@@ -34,16 +36,21 @@ export class NavMenu extends Component {
                                     <NavLink tag={Link} className="text-dark" to="/home">Home</NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink tag={Link} className="text-dark" to="/counter">Counter</NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
+                                    <NavLink tag={Link} className="text-dark" to="/vehicle">Vehicle</NavLink>
                                 </NavItem>
                                 <NavItem>
                                     <NavLink tag={Link} className="text-dark" to="/user">User</NavLink>
                                 </NavItem>
                                 <NavItem>
                                     <NavLink tag={Link} className="text-dark" to="/add-service">Service</NavLink>
+                                </NavItem>
+                                {sessionStorage.getItem('userType') === 'O' &&
+                                    <NavItem>
+                                        <NavLink tag={Link} className="text-dark" to="/provider-list">Providers</NavLink>
+                                    </NavItem>
+                                }
+                                <NavItem>
+                                    <NavLink tag={Link} className="text-dark" to="/notifications">Notifications</NavLink>
                                 </NavItem>
                             </ul>
                         </Collapse>

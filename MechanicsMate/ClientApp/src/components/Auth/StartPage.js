@@ -63,7 +63,7 @@ export class StartPage extends Component {
                 console.log(result);
                 if (result?.token != null) {
 
-                    SessionManager.setUserSession(result.token, result.userId, result.userEmail, result.usersRole)
+                    SessionManager.setUserSession(result.token, result.userId, result.userEmail, result.userType)
 
                     if (SessionManager.getToken() != null) {
                         window.location.href = "/home";

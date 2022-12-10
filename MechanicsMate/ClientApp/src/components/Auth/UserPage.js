@@ -87,10 +87,16 @@ export class UserPage extends Component {
                 </div>
                 <br />
                 {this.state.user.userType === 'S' &&
-                    <input type='button' href='auth/requestaccess'>
+                    <Button href='/request-access' tag='a'>
                         Request User Vehicle Access
-                    </input>
+                    </Button>
                 }
+                {this.state.user.userType === 'O' &&
+                    <Button href='/request-access' tag='a'>
+                        View Access Requests
+                    </Button>
+                }
+                &nbsp;
                 <Button
                     onClick={this.logOut}>
                     Log Out
