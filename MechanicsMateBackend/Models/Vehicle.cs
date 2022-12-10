@@ -12,7 +12,7 @@ namespace MechanicsMateBackend.Models
 
         public int VehicleId { get; set; }
         public int OwnerId { get; set; }
-        public ulong VehicleInfoId { get; set; }
+        public int VehicleInfoId { get; set; }
         public uint Mileage { get; set; }
         public uint? DrivingHabit { get; set; }
         public string Vin { get; set; }
