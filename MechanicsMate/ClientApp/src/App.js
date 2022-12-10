@@ -4,6 +4,7 @@ import { StartPage } from './components/Auth/StartPage';
 import { Home } from './components/Home';
 import { UserPage } from './components/Auth/UserPage';
 import { Layout } from './components/Layout';
+import { ServiceLog } from './components/Service/ServiceLog';
 import { AddService } from './components/Service/AddService';
 import { ProviderList } from './components/Service/ProviderList';
 import SessionManager from "./components/Auth/SessionManager";
@@ -28,7 +29,6 @@ export default class App extends Component {
                 <Layout>
                     <Route exact path='/home' component={Home} />
                     <Route path='/user' component={UserPage} />
-                    <Route path='/add-service' component={AddService} />
                     <Route path='/provider-list' component={ProviderList} />
                     <Route path='/request-access' component={RequestAccess} />
                     <Route path='/notifications' component={Notification} />
@@ -36,6 +36,9 @@ export default class App extends Component {
                     <Route path='/add-vehicle' component={AddVehicle} />
                     <Route path='/edit-vehicle' component={EditVehicle} />
                     <Route path='/delete-vehicle' component={DeleteVehicle} />
+                    <Route path='/add-service' component={AddService}/>
+                    <Route path='/service-log' component={ServiceLog}/>
+
                 </Layout>
             ) : (
                     <Route path='/' component={StartPage} />

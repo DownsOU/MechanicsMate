@@ -12,6 +12,14 @@ namespace MechanicsMate.Controllers
     {
         public string email { get; set; }
     }
+    public class VehicleObject
+    {
+        public int ownerId { get; set; }
+    }
+    public class ServiceObject
+    {
+        public int servicerId { get; set; }
+    }
     [EnableCors("CorsPolicy")]
     [ApiController]
     [Route("api/[controller]")]
@@ -32,6 +40,31 @@ namespace MechanicsMate.Controllers
             var us = new UserService();
             return await us.LoginUser(userLogin);
         }
+        [HttpPost]
+        [Route("GetVehicle")]
+        public async Task <List<Mg1nYearMakeModelMasterAdvanced>>  GetVehicle([FromBody] VehicleObject vehicleobj)
+        {
+            var us = new UserService();
+            var vehicleIds =  await us.GetVehicle(vehicleobj.ownerId);
+            //var y = new List<int> {73920264,73920154};
+            var vehicleList = await us.getVehicleList(vehicleIds);
+            return vehicleList;
+        }
+        [HttpPost]
+        [Route("GetOwnerVehicles")]
+        public async Task <List<Vehicle>>  GetOwnerVehicles([FromBody] VehicleObject vehicleobj)
+        {
+            var us = new UserService();
+            var ownerVehicles =  await us.getOwnerVehicles(vehicleobj.ownerId);
+            return ownerVehicles;
+        }
+        [HttpPost]
+        [Route("AddService")]
+        public async Task<ServiceResponse> AddService([FromBody]ServiceLog serviceCreate)
+        {
+            var us = new UserService();
+            return await us.AddService(serviceCreate);
+        }
 
         [HttpPost]
         [Route("GetCurrentUserDetails")]
@@ -40,7 +73,21 @@ namespace MechanicsMate.Controllers
             var us = new UserService();
             return await us.GetCurrentUserDetails(emailObj.email);
         }
-
+        [HttpPost]
+        [Route("GetServiceType")]
+        public async Task<List<ServiceType>> GetServiceType()
+        {
+            var us = new UserService();
+            return await us.GetServiceType();
+        }
+        [HttpPost]
+        [Route("GetServiceLog")]
+        public async Task <List<ServiceLog>>  GetServiceLogs([FromBody] ServiceObject vehicleobj)
+        {
+            var us = new UserService();
+            var serviceLogs =  await us.getServiceLogs(vehicleobj.servicerId);
+            return serviceLogs;
+        }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         [Route("DeleteCurrentUser")]
