@@ -157,6 +157,8 @@ namespace MechanicsMateBackend.Services
                 service.ServiceNotes = serviceCreate.ServiceNotes;
                 service.InvoicePath = serviceCreate.InvoicePath;
                 mmd.ServiceLogs.Add(service);
+                var vehicle = mmd.Vehicles.Where(v => v.VehicleId == serviceCreate.VehicleId).FirstOrDefault();
+                vehicle.Mileage = serviceCreate.CurrentMileage;
                 await mmd.SaveChangesAsync();
                 return new ServiceResponse
                 {
@@ -231,6 +233,32 @@ namespace MechanicsMateBackend.Services
                     });
                 }
                 return pendingRequestList;
+            }
+        }
+
+        public async Task<string> ApproveOrRejectRequest(ApproveRejectAccess approveReject)
+        {
+            using (var mmd = new mechanics_mate_devContext())
+            {
+                try
+                {
+                    var request = await mmd.UserAccesses.Where(ua => ua.VehicleOwnerId == approveReject.OwnerId
+                    && ua.ServiceProviderId == approveReject.ServiceProviderId).FirstOrDefaultAsync();
+                    if (approveReject.ApproveReject == "Approve")
+                    {
+                        request.RequestStatus = (int)RequestStatus.Accepted;
+                    }
+                    else
+                    {
+                        request.RequestStatus = (int)RequestStatus.Rejected;
+                    }
+                    await mmd.SaveChangesAsync();
+                    return "success";
+                }
+                catch
+                {
+                    return "failure";
+                }
             }
         }
 

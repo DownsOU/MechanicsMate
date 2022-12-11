@@ -59,6 +59,7 @@ export class RequestAccess extends Component {
         }).then(() => {
             console.log("Requested")
             this.setState({ requestedEmail: '' });
+            window.location.href = "/user";
         });
     }
 

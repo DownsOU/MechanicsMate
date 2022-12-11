@@ -10,7 +10,6 @@ export class Notification extends Component {
         this.state = {
             requests: []
         }
-
     }
 
     componentDidMount() {
@@ -30,6 +29,56 @@ export class Notification extends Component {
             });
     }
 
+    approveRequest(request) {
+        fetch('api/User/ApproveOrRejectRequest', {
+            method: 'POST',
+            headers: {
+                "access-control-allow-origin": "*",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SessionManager.getToken()
+            },
+            body: JSON.stringify({
+                OwnerId: request.vehicleOwnerID,
+                ServiceProviderId: request.serviceProviderId,
+                ApproveReject: "Approve"
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                if (result == "success") {
+                    window.location.reload();
+                }
+                else {
+                }
+                console.log(result);
+            });
+    }
+
+    rejectRequest(request) {
+        fetch('api/User/ApproveOrRejectRequest', {
+            method: 'POST',
+            headers: {
+                "access-control-allow-origin": "*",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SessionManager.getToken()
+            },
+            body: JSON.stringify({
+                OwnerId: request.vehicleOwnerID,
+                ServiceProviderId: request.serviceProviderId,
+                ApproveReject: "Reject"
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                if (result == "success") {
+                    window.location.reload();
+                }
+                else {
+                }
+                console.log(result);
+            });
+    }
+
     render() {
         return (
             <div>
@@ -42,9 +91,9 @@ export class Notification extends Component {
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 {request.serviceProviderName}
                                 &nbsp;
-                                <Button>Accept</Button>
+                                <Button onClick={() => this.approveRequest(request)}>Accept</Button>
                                 &nbsp;
-                                <Button>Reject</Button>
+                                <Button onClick={() => this.rejectRequest(request)}>Reject</Button>
                             </div>
                             <br />
                         </div>

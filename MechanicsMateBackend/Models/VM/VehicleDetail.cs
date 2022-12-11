@@ -8,7 +8,7 @@ namespace MechanicsMateBackend.Models.VM
     public class VehicleDetail
     {
 
-        public ulong YmmId { get; set; }
+        public int YmmId { get; set; }
 
         public string Make { get; set; }
 

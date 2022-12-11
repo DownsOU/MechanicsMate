@@ -114,6 +114,15 @@ namespace MechanicsMate.Controllers
             return await us.GetPendingRequests(userId);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPost]
+        [Route("ApproveOrRejectRequest")]
+        public async Task<string> ApproveOrRejectRequest([FromBody] ApproveRejectAccess approveReject)
+        {
+            var us = new UserService();
+            return await us.ApproveOrRejectRequest(approveReject);
+        }
+
         [HttpGet]
         [Route("GetServiceProviderList")]
         public async Task<List<UserDetail>> GetServiceProviderList()
