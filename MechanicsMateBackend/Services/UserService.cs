@@ -198,24 +198,6 @@ namespace MechanicsMateBackend.Services
             }
         }
 
-        public async Task ApproveOrRejectUserAccess(ApproveRejectAccess arAccess)
-        {
-            using (var mmd = new mechanics_mate_devContext())
-            {
-                var userAccess = await mmd.UserAccesses.Where(ua => ua.ServiceProviderId == arAccess.ServiceProviderId && ua.VehicleOwnerId == arAccess.OwnerId).FirstOrDefaultAsync();
-                if (arAccess.ApproveReject == "Approve")
-                {
-                    userAccess.RequestStatus = (int)RequestStatus.Accepted;
-                    return;
-                }
-                if (arAccess.ApproveReject == "Reject")
-                {
-                    userAccess.RequestStatus = (int)RequestStatus.Rejected;
-                    return;
-                }
-            }
-        }
-
         public async Task<List<PendingRequest>> GetPendingRequests(int userId)
         {
             using (var mmd = new mechanics_mate_devContext())
@@ -235,6 +217,74 @@ namespace MechanicsMateBackend.Services
                 return pendingRequestList;
             }
         }
+
+        public async Task<List<ServiceNotification>> GetServiceNotifications(int userId)
+        {
+            using (var mmd = new mechanics_mate_devContext())
+            {
+                var userServiceLogList = new List<ServiceLog>();
+
+                var user = await mmd.Users.Where(u => u.UserId == userId).FirstOrDefaultAsync();
+                if (user.UserType == "S")
+                {
+                    var userAccessList = await mmd.UserAccesses.Where(ua => ua.ServiceProviderId == userId && ua.RequestStatus == (int)RequestStatus.Accepted).Select(ua => ua.VehicleOwner).ToListAsync();
+                    IEnumerable<ServiceLog> serviceLogEnumerable = mmd.ServiceLogs
+                       .Include(sl => sl.Vehicle)
+                       .Include(sl => sl.Vehicle.Owner)
+                       .Include(sl => sl.ServiceType)
+                       .Include(sl => sl.Servicer).AsEnumerable();
+                    IEnumerable<ServiceLog> userServiceLogEnumerable = serviceLogEnumerable.Where(s => userAccessList.Any(ua => ua.UserId == s.Vehicle.OwnerId));
+                    userServiceLogList = userServiceLogEnumerable.ToList();
+                }
+                else
+                {
+                    userServiceLogList = await mmd.ServiceLogs.Where(sl => sl.Vehicle.OwnerId == userId)
+                        .Include(sl => sl.Vehicle)
+                        .Include(sl => sl.Vehicle.Owner)
+                        .Include(sl => sl.ServiceType)
+                        .Include(sl => sl.Servicer).ToListAsync();
+                }
+                var serviceNotificationList = new List<ServiceNotification>();
+                foreach(var userService in userServiceLogList)
+                {
+                    if(userService.ServiceTypeId.HasValue || userService.CustomServiceInterval != 0)
+                    {
+                        uint nextServiceMileage = 0;
+                        if (userService.ServiceType.ServiceName != "Custom Service") 
+                        {
+                            nextServiceMileage = userService.Vehicle.Mileage + userService.ServiceType.ServiceInterval.GetValueOrDefault();
+                        }
+                        else
+                        {
+                            nextServiceMileage = userService.Vehicle.Mileage + userService.CustomServiceInterval.GetValueOrDefault();
+                        }
+
+                        TimeSpan timeSpan = DateTime.Now - userService.ServiceDate;
+                        var daysSinceLastService = timeSpan.Days;
+
+                        var estimatedVehicleMileage = userService.Vehicle.Mileage + (daysSinceLastService * userService.Vehicle.DrivingHabit);
+
+                        var estimatedMileageRemaining = (int)nextServiceMileage - estimatedVehicleMileage;
+
+                        if (estimatedMileageRemaining <= 100)
+                        {
+                            serviceNotificationList.Add(new ServiceNotification {
+                                ServiceName = userService.CustomServiceName ?? userService.ServiceType.ServiceName,
+                                EstimatedMileageRemaining = estimatedMileageRemaining.GetValueOrDefault(),
+                                OwnerEmail = userService.Vehicle.Owner.Email,
+                                ServicerEmail = userService.Servicer.Email
+                            }) ;
+                        }
+                    }
+                }
+                return serviceNotificationList;
+            }
+        }
+
+        //public async Task<List<ServiceNotification>> GetServiceNotifications(List<int> ownerIds)
+        //{
+
+        //}
 
         public async Task<string> ApproveOrRejectRequest(ApproveRejectAccess approveReject)
         {

@@ -8,7 +8,8 @@ export class Notification extends Component {
         super();
 
         this.state = {
-            requests: []
+            requests: [],
+            serviceNotifications: []
         }
     }
 
@@ -25,6 +26,21 @@ export class Notification extends Component {
             .then((result) => {
 
                 this.setState({ requests: result });
+                console.log(this.state.requests);
+            });
+
+        fetch('api/User/GetServiceNotifications?userId=' + sessionStorage.getItem('userId'), {
+            method: 'GET',
+            headers: {
+                "access-control-allow-origin": "*",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SessionManager.getToken()
+            }
+        }).then((Response) => Response.json())
+            .then((result) => {
+
+                this.setState({ serviceNotifications: result });
                 console.log(this.state.requests);
             });
     }
@@ -94,6 +110,30 @@ export class Notification extends Component {
                                 <Button onClick={() => this.approveRequest(request)}>Accept</Button>
                                 &nbsp;
                                 <Button onClick={() => this.rejectRequest(request)}>Reject</Button>
+                            </div>
+                            <br />
+                        </div>
+                    );
+                })}
+                <br />
+                <h5>Upcoming Services:</h5>
+                {this.state.serviceNotifications.map(service => {
+                    return (
+                        <div>
+                            <br />
+                            <div style={{ display: "inline-block" }}>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                {service.serviceName + " - Estimated Mileage Remaining: " + service.estimatedMileageRemaining}
+                                &nbsp;
+                                {(sessionStorage.getItem('userType') == 'O' && 
+                                    sessionStorage.getItem('userEmail') != service.servicerEmail) &&
+                                    <Button href={"mailto:" + service.servicerEmail}>Contact Servicer</Button>
+                                }
+                                &nbsp;
+                                {(sessionStorage.getItem('userType') == 'S' &&
+                                    sessionStorage.getItem('userEmail') != service.ownerEmail) &&
+                                    <Button href={"mailto:" + service.ownerEmail}>Contact Owner</Button>
+                                }
                             </div>
                             <br />
                         </div>

@@ -114,6 +114,14 @@ namespace MechanicsMate.Controllers
             return await us.GetPendingRequests(userId);
         }
 
+        [HttpGet]
+        [Route("GetServiceNotifications")]
+        public async Task<List<ServiceNotification>> GetServiceNotifications(int userId)
+        {
+            var us = new UserService();
+            return await us.GetServiceNotifications(userId);
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         [Route("ApproveOrRejectRequest")]
