@@ -142,6 +142,13 @@ namespace MechanicsMateBackend.Services
             return serviceLogs;   
             }
         }
+        // public async Task <List<ServiceLog>> getServiceLogs1(List<int> vehicleId)
+        // {
+        //     using (var mme = new mechanics_mate_devContext()){
+        //     var serviceLogs = await (from v in mme.ServiceLogs where vehicleId.Contains(v.VehicleId)  select v).ToListAsync<ServiceLog>();
+        //     return serviceLogs;   
+        //     }
+        // }
         public async Task<ServiceResponse> AddService(ServiceLog serviceCreate)
         {
             using (var mmd = new mechanics_mate_devContext())
@@ -285,7 +292,14 @@ namespace MechanicsMateBackend.Services
         //{
 
         //}
-
+        public async Task <List<User>> getServicerVehicles()
+        {
+            Console.Write("getting provider vehciles");
+            using (var mme = new mechanics_mate_devContext()){
+            var servicerVehicles = await (from v in mme.Users select v).ToListAsync<User>();
+            return servicerVehicles;   
+            }
+        }
         public async Task<string> ApproveOrRejectRequest(ApproveRejectAccess approveReject)
         {
             using (var mmd = new mechanics_mate_devContext())
