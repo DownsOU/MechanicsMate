@@ -20,6 +20,10 @@ namespace MechanicsMate.Controllers
     {
         public int servicerId { get; set; }
     }
+    public class ServiceVehiclesObject
+    {
+        public List<int> serviceVehicleId{get;set;}
+    }
     [EnableCors("CorsPolicy")]
     [ApiController]
     [Route("api/[controller]")]
@@ -87,6 +91,22 @@ namespace MechanicsMate.Controllers
             var us = new UserService();
             var serviceLogs =  await us.getServiceLogs(vehicleobj.servicerId);
             return serviceLogs;
+        }
+        // [HttpPost]
+        // [Route("GetServiceLog1")]
+        // public async Task <List<ServiceLog>>  GetServiceLogs1([FromBody] ServiceVehiclesObject vehicleobj)
+        // {
+        //     var us = new UserService();
+        //     var serviceLogs =  await us.getServiceLogs1(vehicleobj.serviceVehicleId);
+        //     return serviceLogs;
+        // }
+        [HttpPost]
+        [Route("GetServicerVehicles")]
+        public async Task <List<User>>  GetServicerVehicles()
+        {
+            var us = new UserService();
+            var servicerVehicles =  await us.getServicerVehicles();
+            return servicerVehicles;
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]

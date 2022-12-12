@@ -6,35 +6,31 @@ import {
     Form,
     Input,
 } from 'reactstrap';
-import SessionManager from "../Auth/SessionManager";
 var date = new Date();
 // var today = new Date().toJSON().slice(0,10);
 var today = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toJSON();
-console.log('TODAY');
-console.log(today);
-
 export class AddService extends Component {
     constructor(props) {
         super();
         this.state = {
-            date: today,
+            servicerAccounts: [],
+            date:today,
             user: {},
             currentVehicle: {},
             selectedService: {},
             vehicleList: [],
             serviceTypes: [],
             vehicleId: {},
-            mileage: 0,
-            customService: "",
+            customService:"",
             customInterval: 0,
-            service: "",
-            serviceNotes: "",
-            ownerVehicles: [],
-            invoicePath: "",
-            vId: 0
+            service:"",
+            serviceNotes:"",
+            ownerVehicles:[],
+            invoicePath:"",
+            vId: 0,
+            ownerId:0
 
         }
-
         this.onServiceTypeChange = this.onServiceTypeChange.bind(this);
         this.setCustomService = this.setCustomService.bind(this);
         this.submitService = this.submitService.bind(this);
@@ -44,14 +40,12 @@ export class AddService extends Component {
         fetch('api/User/GetCurrentUserDetails', {
             method: 'POST',
             headers: {
-                "access-control-allow-origin": "*",
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + SessionManager.getToken()
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 email: sessionStorage.getItem('userEmail')
-            })
+            })  
         }).then((Response) => Response.json())
             .then((result) => {
                 console.log('getCustomerInfo');
@@ -65,48 +59,42 @@ export class AddService extends Component {
                         userType: result.userType
                     }
                 });
-            }).then(
-                fetch('api/User/GetVehicle', {
-                    method: 'POST',
-                    headers: {
-                        "access-control-allow-origin": "*",
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + SessionManager.getToken()
-                    },
-                    body: JSON.stringify({
-                        ownerId: sessionStorage.getItem('userId')
-                    })
-                }).then((Response) => Response.json())
-                    .then((result) => {
-                        console.log('getCars');
-                        this.setState({
-                            vehicleList: result
-                        });
-                        console.log(this.state.vehicleList);
-                    })).then(
-                        fetch('api/User/GetServiceType', {
-                            method: 'POST',
-                            headers: {
-                                "access-control-allow-origin": "*",
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + SessionManager.getToken()
-                            }
-                        }).then((Response) => Response.json())
-                            .then((result) => {
-                                this.setState({
-                                    serviceTypes: result
-                                });
-                                console.log(this.state.serviceTypes);
-                            }))
+            })
+        fetch('api/User/GetVehicle', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ownerId: sessionStorage.getItem('userId')
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log('getCars');
+                this.setState({
+                    vehicleList: result
+                });
+                console.log(this.state.vehicleList);
+            })
+        fetch('api/User/GetServiceType', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then((Response) => Response.json())
+            .then((result) => {
+                this.setState({
+                    serviceTypes: result
+                });
+                console.log(this.state.serviceTypes);
+            })
         fetch('api/User/GetOwnerVehicles', {
             method: 'POST',
             headers: {
-                "access-control-allow-origin": "*",
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + SessionManager.getToken()
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 ownerId: sessionStorage.getItem('userId')
@@ -118,101 +106,171 @@ export class AddService extends Component {
                     ownerVehicles: result
                 });
                 console.log(this.state.ownerVehicles);
-            })
-            ;
-    }
-
-    submitService() {
-        console.log('Submit Service');
-        fetch('api/User/AddService', {
+            });
+                    fetch('api/User/GetOwnerVehicles', {
             method: 'POST',
             headers: {
-                "access-control-allow-origin": "*",
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + SessionManager.getToken()
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ownerId: sessionStorage.getItem('userId')
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log('ownerVehicles');
+                this.setState({
+                    ownerVehicles: result
+                });
+                console.log(this.state.ownerVehicles);
+            });
+            fetch('api/User/GetServicerVehicles', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            }).then((Response) => Response.json())
+                .then((result) => {
+                    console.log(result)
+                    this.setState({
+                        servicerAccounts: result})
+                    console.log("servicerAccounts")
+                    console.log(this.state.servicerAccounts);
+                })
+      }
+    submitService(){
+        try{
+        let customService = document.forms["myForm"]["customservice"].value;
+        if (customService === "") {
+            alert("Enter custom service name");
+            return false
+          }}
+          catch(error){console.log(error)}
+        try{
+        let customInterval = document.forms["myForm"]["custominterval"].value;
+        if (customInterval <=0) {
+            alert("Enter a valid custom interval");
+            return false
+          }}catch(error){console.log(error)}   
+        console.log('Submit Service');
+        console.log(this.state.vId);
+        console.log(
+            JSON.stringify({
+                ServicerId: this.state.user.userid,
+                ServiceTypeId:this.state.selectedService.servicetypeid,   
+                VehicleId:this.state.vId,
+                CustomServiceName:this.state.customService,
+                CustomServiceInterval: this.state.customInterval,
+                ServiceDate:this.state.date,
+                ServiceNotes:this.state.serviceNotes,
+                CurrentMileage:this.state.currentVehicle.mileage,
+                InvoicePath: this.state.invoicePath
+                })
+        );
+        fetch('api/User/AddService/', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 ServicerId: this.state.user.userid,
-                ServiceTypeId: this.state.selectedService.servicetypeid,
-                VehicleId: this.state.vId,
-                CustomServiceName: this.state.customService,
+                ServiceTypeId:this.state.selectedService.servicetypeid,           
+                VehicleId:this.state.vId,
+                CustomServiceName:this.state.customService,
                 CustomServiceInterval: this.state.customInterval,
-                CurrentMileage: this.state.mileage,
-                ServiceDate: this.state.date,
-                ServiceNotes: this.state.serviceNotes,
+                CurrentMileage:this.state.currentVehicle.mileage,
+                ServiceDate:this.state.date,
+                ServiceNotes:this.state.serviceNotes,
                 InvoicePath: this.state.invoicePath
-
             })
         }).then((Response) => Response.text())
             .then((result) => {
-                console.log(JSON.parse(result).status);
-                if (JSON.parse(result).status === "Success") {
-                    window.location.reload();
-                }
-                else {
-                    alert("Error adding Service Log Entry");
-                }
-            });
+                console.log(result);});
+        alert("Service Successfully added")
     }
-    setServiceNotes(e) {
-        this.setState({ serviceNotes: e.target.value })
+    setServiceNotes(e){
+        this.setState({serviceNotes:e.target.value})
+    }
+    setOwnerId(e){
+        this.setState({ownerId:e.target.value})
     }
     onServiceTypeChange(e) {
-        this.setState({ service: e.target.value });
+        this.setState({service: e.target.value});
     }
 
     setCustomService(e) {
-        this.setState({ customService: e.target.value });
+        this.setState({customService:e.target.value});
     }
     setCustomInterval(e) {
         this.setState({ customInterval: e.target.value });
     }
-    setMileage(e) {
-        this.setState({ mileage: e.target.value });
-    }
-    setServiceType(e) {
+    setServiceType(e){
+        console.log(this.state.servicerAccounts)
         console.log("set service type");
         console.log(e.target.value)
-        if (e.target.value === "Custom Service") {
-            this.setState({ service: e.target.value })
-        }
-        try {
-            var serviceType = this.state.serviceTypes.find(x => x.serviceName === e.target.value);
-            console.log(serviceType);
-            this.setState({
-                selectedService: {
-                    servicetypeid: serviceType.serviceTypeId,
-                    servicename: serviceType.serviceName,
-                    serviceinterval: serviceType.serviceInterval
-                },
-                service: e.target.value
-            })
-        }
-        catch (error) {
-            console.log(error);
-        }
+        if (e.target.value ==="Custom Service"){
+            this.setState({service:e.target.value})}
+        try{
+        var serviceType = this.state.serviceTypes.find(x=> x.serviceName === e.target.value);
+        console.log(serviceType);
+        this.setState({
+            selectedService:{
+                servicetypeid: serviceType.serviceTypeId,
+                servicename: serviceType.serviceName,
+                serviceinterval: serviceType.serviceInterval
+            },
+            service: e.target.value
+        })
     }
-    setVehicleId(e) {
-        try {
-            //console.log('selectVehicle ' + e.target.value.toString());
-            var selectedVehicle = this.state.vehicleList.find(function (vehicle) {
-                return vehicle.ymmId === parseInt(e.target.value);
-            });
-            var selectedOwner = this.state.ownerVehicles.find(function (vehicle) {
-                return vehicle.vehicleInfoId === parseInt(e.target.value);
-            });
-            //console.log(selectedVehicle);
-            //console.log(selectedOwner);
-                this.setState({
-                    currentVehicle: selectedVehicle,
-                    vId: selectedOwner.vehicleId
-                });
-            //console.log(this.state.vId);
-        }
-        catch (error) {
+        catch(error){
             console.log(error);
         }
+    }   
+    setVehicleId(e){
+        try{
+        console.log('selectVehicle');
+        console.log(sessionStorage.getItem("userId"))
+        var selectedVehicle = this.state.vehicleList.find(x=> x.ymmId==e.target.value);
+        var selectedOwner = this.state.ownerVehicles.find(x=> x.vehicleInfoId==e.target.value);
+        console.log(selectedOwner);
+        this.setState({
+            currentVehicle: {
+                engine : selectedVehicle.engine,
+                id :selectedVehicle.ymmId,
+                make : selectedVehicle.make,
+                model : selectedVehicle.model,
+                year : selectedVehicle.year,
+                trim : selectedVehicle.trim,
+                mileage: selectedOwner.mileage
+            },
+            vId : selectedOwner.vehicleId
+        })
+    console.log(this.state.currentVehicle.make)}
+        catch(error){
+            console.log(error);
+        } 
+    }
+    async setServicerVehicles(e){
+        await this.setOwnerId(e)
+        fetch('api/User/GetVehicle', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ownerId: this.state.ownerId
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log('servicerAccounts');
+                this.setState({
+                    vehicleList: result
+                });
+                console.log(this.state.vehicleList);
+            })
+
     }
 
     render(vehicleList) {
@@ -234,103 +292,107 @@ export class AddService extends Component {
             textAlign: "center",
             paddingBottom: "4%"
         };
-
+        
         return (
-
             <div style={center}>
                 <h2 style={{ padding: "4%" }}>Add Service</h2>
-                <Input style={mystyle}
-                    id='selectcar'
+                <Form name = "myForm"
+                onSubmit={this.validateForm}>
+                    {this.state.user.userType === "S" &&
+                    <Input style={mystyle}
+                    id='selectAccount'
                     type='select'
-
-                    onChange={(e) => this.setVehicleId(e)}
-                >
-                    <option value="">Select Vehicle</option>
-                    {this.state.vehicleList.map((vehicle) => {
+                    onChange={(e) => this.setServicerVehicles(e)}>
+                    <option value="">Select Customer's Account</option>  
+                        {this.state.servicerAccounts.map((accounts) => {
                         return (
-                            <option key={vehicle.ymmId} value={vehicle.ymmId}>
-                                {vehicle.vehicleDisplayName}
-                            </option>
-                        );
-                    })
+                        <option key={accounts.userId} value={accounts.userId}>
+                        {accounts.firstName} {accounts.lastName}
+                        </option>);})
+                        }
+                    </Input>
                     }
-                </Input>
-                <Input style={mystyle}
-                    id='servicetype'
-                    type='select'
-                    onChange={(e) => this.setServiceType(e)} >
-                    <option value="">Select Service</option>
-                    <option>
-                        Oil Change
-                    </option>
-                    <option>
-                        Tire Rotation
-                    </option>
-                    <option>
-                        Tire Replacement
-                    </option>
-                    <option>
-                        Air Filter
-                    </option>
-                    <option>
-                        Transmission Fluid
-                    </option>
-                    <option>
-                        Spark Plugs
-                    </option>
-                    <option>
-                        Car Battery
-                    </option>
-                    <option>
-                        Custom Service
-                    </option>
-
-
-                </Input>
-                <Input
-                    style={mystyle}
-                    id='mileage'
-                    placeholder='Enter Current Mileage'
-                    type='number'
-                    onChange={(e) => this.setMileage(e)}
-                    required
-                />
-                <Input
+                    <Input style={mystyle}
+                        id='selectcar'
+                        type='select'
+                        onChange={(e) => this.setVehicleId(e)}
+                        >
+                        <option value="">Select Vehicle</option>  
+                        {this.state.vehicleList.map((vehicle) => {
+                            return (
+                            <option key={vehicle.ymmId} value={vehicle.ymmId}>
+                            {vehicle.vehicleDisplayName}
+                            </option>
+                            );})
+                        }
+                        </Input>
+                    <Input style={mystyle}
+                        id='servicetype'
+                        type='select'
+                        onChange={(e) =>this.setServiceType(e)} >
+                        <option value="">Select Service</option>  
+                        <option>
+                            Oil Change
+                        </option>
+                        <option>
+                            Tire Rotation
+                        </option>
+                        <option>
+                            Tire Replacement
+                        </option>
+                        <option>
+                            Air Filter
+                        </option>
+                        <option>
+                            Transmission Fluid
+                        </option>
+                        <option>
+                            Spark Plugs
+                        </option>
+                        <option>
+                            Car Battery
+                        </option>
+                        <option>
+                            Custom Service
+                        </option>
+                    </Input>
+                    <Input
                     style={mystyle}
                     id='servicenotes'
                     placeholder='Enter Service Notes'
                     type='text'
-                    onChange={(e) => this.setServiceNotes(e)}
-                />
-
-                {this.state.service === "Custom Service" &&
-                    <Input
-                        style={mystyle}
-                        id='customservice'
-                        placeholder='Enter Custom Service Name'
-                        type='text'
-                        onChange={(e) => this.setCustomService(e)}
-                        required
+                    onChange={(e)=>this.setServiceNotes(e)}
                     />
-                }
-                {this.state.service === "Custom Service" &&
-                    <Input
-                        style={mystyle}
-                        id='custominterval'
-                        placeholder='Enter Custom Interval'
-                        type='number'
-                        onChange={(e) => this.setCustomInterval(e)}
-                        required
-                    />
-                }
-                <Button
-                    onClick={() => this.submitService()}>
-                    Submit
-                </Button>
 
+                    {this.state.service === "Custom Service" &&
+                        <Input
+                            style={mystyle}
+                            id='customservice'
+                            placeholder='Enter Custom Service Name'
+                            type='text' 
+                            onChange={(e) =>this.setCustomService(e)} 
+                            required
+                            />
+                        }
+                    {this.state.service === "Custom Service" &&
+                        <Input
+                            style={mystyle}
+                            id='custominterval'
+                            placeholder='Enter Custom Interval'
+                            type='number'
+                            onChange={(e) =>this.setCustomInterval(e)} 
+                            required
+                            />
+                        }
+                    <Button
+                        onClick = {this.submitService}>
+                        Submit
+                    </Button>
+                </Form>
+                
             </div>
-
+                        
 
         );
     }
-}
+    }
