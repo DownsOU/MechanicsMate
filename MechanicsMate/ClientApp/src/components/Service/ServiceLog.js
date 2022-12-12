@@ -212,8 +212,11 @@ export class ServiceLog extends Component {
         //             }
         //         });
         //     }); 
+        try{
         var servicer = this.state.servicerAccounts.find(x=> x.userId ==id);
         return [servicer.firstName," ",servicer.lastName]
+    }
+            catch(error){console.log(error)}
     }
     getServiceType(log)
     {
@@ -300,7 +303,11 @@ export class ServiceLog extends Component {
             {this.state.serviceLogs.map(log =>      
                 <tr key={log.serviceLogId}>  
                     <td>{this.formatDate(log.serviceDate)}</td> 
-                    <td>{this.getServicer(log.servicerId)}</td> 
+                    <td>{
+                    this.getServicer(log.servicerId)
+                    //log.servicerId
+
+                    }</td> 
                     <td>{this.getServiceType(log)}</td>  
                     <td>{this.getVehicleName(log.vehicleId)}</td>
                     <td>{log.currentMileage}</td>  
