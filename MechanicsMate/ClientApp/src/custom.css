@@ -1,16 +1,10 @@
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+  color: white;
 }
 
 code {
   color: #E01A76;
-}
-
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
 }
 
 label.label input[type="file"] {
@@ -43,3 +37,53 @@ label.label input[type="file"] {
     .label:valid + span {
         color: #ffffff;
     }
+
+/* Provide sufficient contrast against white background */
+a {
+    color: white;
+}
+
+code {
+    color: #E01A76;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: seagreen;
+    border-color: #1861ac32;
+}
+
+.btn-secondary {
+    color: #fff;
+    background-color: seagreen;
+    border-color: #1861ac32;
+    display: inline-block;
+}
+
+h1 {
+    text-align: center;
+    color: white;
+}
+
+body {
+    background-color: dimgray;
+}
+
+btn {
+    color: seagreen;
+    border-color: #1861ac32;
+    position: center;
+}
+
+input.form-control {
+    width: 25%;
+    position: center;
+}
+
+select.form-control {
+    width: 25%;
+}
+
+p, header, li, tr, h2, h3, h5 {
+    color: white;
+}

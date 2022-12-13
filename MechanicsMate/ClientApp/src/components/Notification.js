@@ -107,7 +107,7 @@ export class Notification extends Component {
                                     <br />
                                     <div style={{ display: "inline-block" }}>
                                         &nbsp;&nbsp;&nbsp;&nbsp;
-                                        {request.serviceProviderName}
+                                        <p>{request.serviceProviderName}</p>
                                         &nbsp;
                                         <Button onClick={() => this.approveRequest(request)}>Accept</Button>
                                         &nbsp;
@@ -125,7 +125,7 @@ export class Notification extends Component {
                             <br />
                             <div style={{ display: "inline-block" }}>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                {service.serviceName + " - Estimated Mileage Remaining: " + service.estimatedMileageRemaining}
+                                <p>{service.serviceName + " - Estimated Mileage Remaining: " + service.estimatedMileageRemaining}</p>
                                 &nbsp;
                                 {(sessionStorage.getItem('userType') == 'O' && 
                                     sessionStorage.getItem('userEmail') != service.servicerEmail) &&

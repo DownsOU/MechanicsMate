@@ -116,35 +116,58 @@ export class StartPage extends Component {
     }
 
     render() {
+        const mystyle = {
+            fontFamily: "Arial",
+            width: "60%",
+            border: "2px solid black",
+            margin: "0 auto",
+            marginTop: "5%",
+            marginBottom: "5%",
+            textAlign: "center"
+        };
+        const center = {
+            borderRadius: "25px",
+            fontFamily: "Arial",
+            width: "50%",
+            border: "2px solid black",
+            margin: "0 auto",
+            textAlign: "center",
+            paddingBottom: "4%"
+        };
         return (
-            <div className="flex-row align-items-center">
+            <div className="flex-row align-items-center" style={center}>
 
                 <h1>Mechanic's Mate</h1>
                 <Form>
                     <Input
+                        style={mystyle}
                         name='email'
                         placeholder='Email'
                         type='email'
                         onChange={this.onChange} />
                     <Input
+                        style={mystyle}
                         name='password'
                         placeholder='Password'
                         type='password'
                         onChange={this.onChange} />
                     {this.state.isSignUp === true &&
                         <Input
+                        style={mystyle}
                             name='firstName'
                             placeholder='First Name'
                             type='text'
                             onChange={this.onChange} />}
                     {this.state.isSignUp === true &&
                         <Input
+                        style={mystyle}
                             name='lastName'
                             placeholder='Last Name'
                             type='text'
                             onChange={this.onChange} />}
                     {this.state.isSignUp === true &&
                         <Input
+                        style={mystyle}
                             name='userType'
                             type='select'
                             onChange={this.onChange} >
