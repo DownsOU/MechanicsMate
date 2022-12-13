@@ -164,6 +164,13 @@ namespace MechanicsMateBackend.Services
             return serviceLogs;   
             }
         }
+        public async Task <Vehicle> ymmToVehicleId(int ymm)
+        {
+            using (var mme = new mechanics_mate_devContext()){
+            var vehicle = await (from v in mme.Vehicles where ymm ==v.VehicleInfoId select v).FirstOrDefaultAsync();
+            return vehicle;   
+            }
+        }
         public async Task<ServiceResponse> AddService(ServiceLog serviceCreate)
         {
             using (var mmd = new mechanics_mate_devContext())

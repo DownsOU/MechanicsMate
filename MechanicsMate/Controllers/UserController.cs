@@ -15,6 +15,10 @@ namespace MechanicsMate.Controllers
     public class VehicleObject
     {
         public int ownerId { get; set; }
+
+    }
+    public class YmmId{
+        public int ymmId { get; set; }
     }
     public class ServiceObject
     {
@@ -87,6 +91,13 @@ namespace MechanicsMate.Controllers
         {
             var us = new UserService();
             return await us.GetServiceType();
+        }
+        [HttpPost]
+        [Route("ymmToVehicleId")]
+        public async Task<Vehicle> YmmToVehcileId([FromBody] YmmId vehicleobj)
+        {
+            var us = new UserService();
+            return await us.ymmToVehicleId(vehicleobj.ymmId);
         }
         [HttpPost]
         [Route("GetServiceLog")]

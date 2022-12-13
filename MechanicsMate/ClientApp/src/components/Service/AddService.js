@@ -13,6 +13,7 @@ export class AddService extends Component {
     constructor(props) {
         super();
         this.state = {
+            currentVehicleId:{},
             servicerVehciles:[],
             servicerAccounts: [],
             date:today,
@@ -138,7 +139,7 @@ export class AddService extends Component {
                 console.log(result)
                 this.setState({
                     servicerAccounts: result})
-                console.log("servicerAccounts")
+                console.log("servicerAccounts2")
                 console.log(this.state.servicerAccounts);
             })
 
@@ -231,12 +232,31 @@ export class AddService extends Component {
             console.log(error);
         }
     }   
-    setVehicleId(e){
+    async ymmToVehicleId(ymm)
+    {
+        await fetch('api/User/ymmToVehicleId', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ymmId: ymm
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {  
+                this.setState({
+                    currentVehicleId: result.vehicleId
+                });
+            });
+
+    }
+    async setVehicleId(e){
         try{
         console.log('selectVehicle');
-        console.log(sessionStorage.getItem("userId"))
         var selectedVehicle = this.state.vehicleList.find(x=> x.ymmId==e.target.value);
-        var selectedOwner = this.state.ownerVehicles.find(x=> x.vehicleInfoId==e.target.value);
+        await this.ymmToVehicleId(e.target.value);
+        var vehicleId = this.state.currentVehicleId
         this.setState({
             currentVehicle: {
                 engine : selectedVehicle.engine,
@@ -245,9 +265,9 @@ export class AddService extends Component {
                 model : selectedVehicle.model,
                 year : selectedVehicle.year,
                 trim : selectedVehicle.trim,
-                mileage: selectedOwner.mileage
+                mileage: selectedVehicle.mileage
             },
-            vId : selectedOwner.vehicleId
+            vId : vehicleId
         })}
         catch(error){
             console.log(error);
@@ -266,7 +286,7 @@ export class AddService extends Component {
             })
         }).then((Response) => Response.json())
             .then((result) => {
-                console.log('servicerAccounts');
+                console.log('servicerAccounts1');
                 this.setState({
                     vehicleList: result
                 });
