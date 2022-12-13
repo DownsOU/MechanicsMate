@@ -130,6 +130,7 @@ namespace MechanicsMateBackend.Services
             using (var mme = new mechanics_mate_devContext())
             {
                 var vehicleList = await mme.Vehicles.Where(v => v.VehicleId == id).Include(v => v.VehicleInfo).ToListAsync();
+                Console.Write(vehicleList);
                 var idAndNameList = new List<KeyValuePair<uint, uint?>>();
                 foreach (var vehicle in vehicleList)
                 {
@@ -147,6 +148,21 @@ namespace MechanicsMateBackend.Services
                 car.Mileage = Mileage;
                 car.DrivingHabit = DrivingHabit.GetValueOrDefault();
                 await mme.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<KeyValuePair<int, string>>> GetCustList(int id)
+        {
+            using (var mme = new mechanics_mate_devContext())
+            {
+                var cust = await mme.UserAccesses.Where(v => v.ServiceProviderId == id).Where(v => v.RequestStatus == 2).Include(v => v.VehicleOwner).ToListAsync();
+                var idAndNameList = new List<KeyValuePair<int, string>>();
+                foreach (var c in cust)
+                {
+                    string name = c.VehicleOwner.FirstName + " " + c.VehicleOwner.LastName;
+                    idAndNameList.Add(new KeyValuePair<int, string>(c.VehicleOwnerId, name));
+                }
+                return idAndNameList;
             }
         }
     }

@@ -169,5 +169,13 @@ namespace MechanicsMate.Controllers
             }
             catch { return "Fail"; }
         }
+
+        [HttpPost]
+        [Route("GetCustList")]
+        public async Task<List<KeyValuePair<int, string>>> GetCustList([FromBody] Carlist Nameobj)
+        {
+            var vs = new VehicleService();
+            return await vs.GetCustList(Nameobj.uid);
+        }
     }
 }

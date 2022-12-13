@@ -12,6 +12,7 @@ export class EditVehicle extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            role= sessionStorage.getItem('userType'),
             carList: [],
             data: false,
             vName: '',
@@ -21,14 +22,41 @@ export class EditVehicle extends Component {
             Mileage: '',
             Driving: '',
             newMileage: 0,
-            newDrivingHabit: 0
+            newDrivingHabit: 0,
+            custList: [],
+            cid: sessionStorage.getItem('userId')
         }
         this.onCarSelete = this.onCarSelete.bind(this);
         this.onUpdate = this.onUpdate.bind(this);
         this.onChange = this.onChange.bind(this);
         this.UpdateCar = this.UpdateCar.bind(this);
+        this.onCustChange = this.onCustChange.bind(this);
     }
     componentDidMount() {
+        if (this.state.role == 'S') {
+            fetch('api/Vehicle/GetCustList', {
+                method: 'POST',
+                headers: {
+                    "access-control-allow-origin": "*",
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + SessionManager.getToken()
+                },
+                body: JSON.stringify({
+                    uid: sessionStorage.getItem('userId')
+                })
+            }).then((Response) => Response.json())
+                .then((result) => {
+                    console.log(result);
+                    this.setState({
+                        custList: result
+                    });
+                    this.setState({
+                        custList: this.state.custList.sort()
+                    })
+                })
+        }
+        else {
         fetch('api/Vehicle/GetAllCar', {
             method: 'POST',
             headers: {
@@ -38,7 +66,7 @@ export class EditVehicle extends Component {
                 'Authorization': 'Bearer ' + SessionManager.getToken()
             },
             body: JSON.stringify({
-                uid: sessionStorage.getItem('userId')
+                    uid: this.state.cid
             })
         }).then((Response) => Response.json())
             .then((result) => {
@@ -50,6 +78,7 @@ export class EditVehicle extends Component {
                     carList: this.state.carList.sort()
                 })
             })
+    }
     }
 
     getDetails() {
@@ -135,6 +164,31 @@ export class EditVehicle extends Component {
                 }
             });
     }
+
+    getCar() {
+        fetch('api/Vehicle/GetAllCar', {
+            method: 'POST',
+            headers: {
+                "access-control-allow-origin": "*",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SessionManager.getToken()
+            },
+            body: JSON.stringify({
+                uid: this.state.cid
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log(result);
+                this.setState({
+                    carList: result
+            });
+                this.setState({
+                    carList: this.state.carList.sort()
+                })
+            })
+    }
+
     onChange(e) {
         this.setState({ [e.target.id]: e.target.value });
     }
@@ -155,6 +209,17 @@ export class EditVehicle extends Component {
 
     onUpdate() {
         this.UpdateCar();
+    }
+
+    onCustChange(e) {
+        console.log(this.state.cid);
+        var newName = e.target.value;
+        var myarr = newName.split("_");
+
+        var newid = myarr[0];
+        this.state.cid = newid;
+        console.log(this.state.cid);
+        this.getCar();
     }
 
     render() {
@@ -180,6 +245,19 @@ export class EditVehicle extends Component {
         return (
             <div style={center}>
                 <h2 style={{ padding: "4%" }}>Welcom to Mechanics Mate</h2>
+                {this.state.role == 'S' &&
+                    <Input style={mystyle}
+                        id='Customers'
+                        type='select'
+                        onChange={(e) => this.onCustChange(e)}
+                    >
+                        <option style={mystyle} selected disabled>Customers</option>
+                        {this.state.custList.map(item => (
+                            <option key={String(item.key)} value={item.key + '_' + item.value}>{item.value}</option>
+                        ))}
+                    </Input>
+                }
+
                     <Input style={mystyle}
                         id='carList'
                         type='select'

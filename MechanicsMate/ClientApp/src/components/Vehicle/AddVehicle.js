@@ -13,6 +13,7 @@ export class AddVehicle extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            role: sessionStorage.getItem('userType'),
             makelist: [],
             vmake: '',
             yearlist: [],
@@ -24,7 +25,9 @@ export class AddVehicle extends Component {
             vDetail: {},
             data: false,
             txtMileage: '',
-            txtDrivingHabit: ''
+            txtDrivingHabit: '',
+            custList: [],
+            cid: sessionStorage.getItem('userId')
         }
         this.onMakeSeleteChange = this.onMakeSeleteChange.bind(this);
         this.onYearSeleteChange = this.onYearSeleteChange.bind(this);
@@ -32,9 +35,34 @@ export class AddVehicle extends Component {
         this.onVNameChange = this.onVNameChange.bind(this);
         this.onChange = this.onChange.bind(this);
         this.onSave = this.onSave.bind(this);
+        this.onCustChange = this.onCustChange.bind(this);
     }
 
     componentDidMount() {
+        if (this.state.role == 'S') {
+            fetch('api/Vehicle/GetCustList', {
+                method: 'POST',
+                headers: {
+                    "access-control-allow-origin": "*",
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + SessionManager.getToken()
+                },
+                body: JSON.stringify({
+                    uid: sessionStorage.getItem('userId')
+                })
+            }).then((Response) => Response.json())
+                .then((result) => {
+                    console.log(result);
+                    this.setState({
+                        custList: result
+                    });
+                    this.setState({
+                        custList: this.state.custList.sort()
+                    })
+                })
+        }
+        
         fetch('api/Vehicle/GetAllMakes', {
             method: 'GET',
             headers: {
@@ -53,6 +81,7 @@ export class AddVehicle extends Component {
                     makelist: this.state.makelist.sort()
                 })
             })
+
 
     }
 
@@ -171,7 +200,7 @@ export class AddVehicle extends Component {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    OwnerId: sessionStorage.getItem('userId'),
+                    OwnerId: this.state.cid,
                     VehicleInfoId: this.state.vDetail.ymmId,
                     Mileage: this.state.txtMileage,
                     DrivingHabit: this.state.txtDrivingHabit
@@ -186,6 +215,27 @@ export class AddVehicle extends Component {
                 }
                 console.log(result);
             });
+    }
+
+    getMake() {
+        fetch('api/Vehicle/GetAllMakes', {
+            method: 'GET',
+            headers: {
+                "access-control-allow-origin": "*",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SessionManager.getToken()
+            }
+        }).then((Response) => Response.json())
+            .then((result) => {
+
+                this.setState({
+                    makelist: result
+                });
+                this.setState({
+                    makelist: this.state.makelist.sort()
+                })
+            })
     }
 
     onMakeSeleteChange(e) {
@@ -224,6 +274,16 @@ export class AddVehicle extends Component {
     onSave() {
         this.insertCar();
     }
+    onCustChange(e) {
+        console.log(this.state.cid);
+        var newName = e.target.value;
+        var myarr = newName.split("_");
+
+        var newid = myarr[0];
+        this.state.cid = newid;
+        console.log(this.state.cid);
+        this.getMake();
+    }
 
     render() {
         const mystyle = {
@@ -249,6 +309,18 @@ export class AddVehicle extends Component {
             <div style={center}>
                 <h2 style={{ padding: "4%" }}>Welcom to Mechanics Mate</h2>
                 <Form>
+                    {this.state.role == 'S' &&
+                        <Input style={mystyle}
+                        id='Customers'
+                        type='select'
+                        onChange={(e) => this.onCustChange(e)}
+                    >
+                        <option style={mystyle} selected disabled>Customers</option>
+                        {this.state.custList.map(item => (
+                            <option key={String(item.key)} value={item.key + '_' + item.value}>{item.value}</option>
+                        ))}
+                    </Input>
+                    }
 
                     <Input style={mystyle}
                         id='vehicleMake'
