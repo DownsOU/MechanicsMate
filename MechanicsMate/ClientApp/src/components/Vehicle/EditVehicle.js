@@ -30,6 +30,7 @@ export class EditVehicle extends Component {
         this.onUpdate = this.onUpdate.bind(this);
         this.onChange = this.onChange.bind(this);
         this.UpdateCar = this.UpdateCar.bind(this);
+        this.onCustChange = this.onCustChange.bind(this);
     }
     componentDidMount() {
         if (this.state.role == 'S') {
