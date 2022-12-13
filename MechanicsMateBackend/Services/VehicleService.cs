@@ -144,13 +144,8 @@ namespace MechanicsMateBackend.Services
             using (var mme = new mechanics_mate_devContext())
             {
                 var car = await mme.Vehicles.Where(v => v.VehicleId == id).FirstAsync();
-                var data = new Vehicle();
-                data.VehicleId = id;
-                data.OwnerId = car.OwnerId;
-                data.VehicleInfoId = car.VehicleInfoId;
-                data.Mileage = Mileage;
-                data.DrivingHabit = DrivingHabit;
-                mme.Vehicles.Update(data);
+                car.Mileage = Mileage;
+                car.DrivingHabit = DrivingHabit.GetValueOrDefault();
                 await mme.SaveChangesAsync();
             }
         }

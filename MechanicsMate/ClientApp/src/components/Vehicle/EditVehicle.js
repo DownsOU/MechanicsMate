@@ -20,12 +20,13 @@ export class EditVehicle extends Component {
             Mileage_Driving: {},
             Mileage: '',
             Driving: '',
-            txtMileage: '',
-            txtDrivingHabit: ''
+            newMileage: 0,
+            newDrivingHabit: 0
         }
         this.onCarSelete = this.onCarSelete.bind(this);
         this.onUpdate = this.onUpdate.bind(this);
         this.onChange = this.onChange.bind(this);
+        this.UpdateCar = this.UpdateCar.bind(this);
     }
     componentDidMount() {
         fetch('api/Vehicle/GetAllCar', {
@@ -120,14 +121,14 @@ export class EditVehicle extends Component {
                 },
                 body: JSON.stringify({
                     Id: this.state.carId,
-                    Mileage: this.state.Mileage,
-                    DrivingHabit: this.state.Driving
+                    Mileage: this.state.newMileage,
+                    DrivingHabit: this.state.newDrivingHabit
                 })
             }).then((Response) => Response.json())
             .then((result) => {
                 console.log(result);
                 if (result == "Success") {
-                    window.location.href = "/home";
+                    window.location.href = "/vehicle";
                 }
                 else {
                     alert("Error Updating Car");
@@ -179,7 +180,6 @@ export class EditVehicle extends Component {
         return (
             <div style={center}>
                 <h2 style={{ padding: "4%" }}>Welcom to Mechanics Mate</h2>
-                <Form>
                     <Input style={mystyle}
                         id='carList'
                         type='select'
@@ -218,9 +218,9 @@ export class EditVehicle extends Component {
 
 
                         <Input style={mystyle}
-                            id='txtMileage'
+                            id='newMileage'
                             placeholder={this.state.Mileage}
-                            type='text'
+                            type='number'
                             onChange={(e) => this.onChange(e)}> </Input>
                     }
 
@@ -228,12 +228,12 @@ export class EditVehicle extends Component {
 
                         <Input style={mystyle}
                             placeholder={this.state.Driving}
-                            id='txtDrivingHabit'
+                            id='newDrivingHabit'
                             onChange={(e) => this.onChange(e)}
-                            type='text'> </Input>
+                            type='number'> </Input>
                     }
-                    <Button style={{ padding: "2%" }} onClick={this.onUpdate}>
-                        Updat Car
+                    <Button style={{ padding: "2%" }} onClick={this.UpdateCar}>
+                        Update Car
                     </Button>
 
                     <Button style={{
@@ -242,7 +242,6 @@ export class EditVehicle extends Component {
                     }}    >
                         Reset
                     </Button>
-                </Form>
             </div >
         );
     }
