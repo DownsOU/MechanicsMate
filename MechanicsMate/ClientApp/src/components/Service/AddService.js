@@ -13,6 +13,7 @@ export class AddService extends Component {
     constructor(props) {
         super();
         this.state = {
+            servicerVehciles:[],
             servicerAccounts: [],
             date:today,
             user: {},
@@ -36,7 +37,7 @@ export class AddService extends Component {
         this.submitService = this.submitService.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         fetch('api/User/GetCurrentUserDetails', {
             method: 'POST',
             headers: {
@@ -75,7 +76,6 @@ export class AddService extends Component {
                 this.setState({
                     vehicleList: result
                 });
-                console.log(this.state.vehicleList);
             })
         fetch('api/User/GetServiceType', {
             method: 'POST',
@@ -89,6 +89,23 @@ export class AddService extends Component {
                     serviceTypes: result
                 });
                 console.log(this.state.serviceTypes);
+            })
+        await fetch('api/User/GetServicerAccess', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                servicerAccess: sessionStorage.getItem('userId')
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log("Servicer Accessible vehicles")
+                this.setState({
+                    servicerVehciles: result.map(a => a.vehicleOwnerId)
+                })
+                console.log(this.state.servicerVehciles)
             })
         fetch('api/User/GetOwnerVehicles', {
             method: 'POST',
@@ -107,37 +124,24 @@ export class AddService extends Component {
                 });
                 console.log(this.state.ownerVehicles);
             });
-                    fetch('api/User/GetOwnerVehicles', {
+        await fetch('api/User/GetServicerVehicles', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                ownerId: sessionStorage.getItem('userId')
+                serviceVehicleId: this.state.servicerVehciles
             })
         }).then((Response) => Response.json())
             .then((result) => {
-                console.log('ownerVehicles');
+                console.log(result)
                 this.setState({
-                    ownerVehicles: result
-                });
-                console.log(this.state.ownerVehicles);
-            });
-            fetch('api/User/GetServicerVehicles', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-            }).then((Response) => Response.json())
-                .then((result) => {
-                    console.log(result)
-                    this.setState({
-                        servicerAccounts: result})
-                    console.log("servicerAccounts")
-                    console.log(this.state.servicerAccounts);
-                })
+                    servicerAccounts: result})
+                console.log("servicerAccounts")
+                console.log(this.state.servicerAccounts);
+            })
+
       }
     submitService(){
         try{
@@ -233,7 +237,6 @@ export class AddService extends Component {
         console.log(sessionStorage.getItem("userId"))
         var selectedVehicle = this.state.vehicleList.find(x=> x.ymmId==e.target.value);
         var selectedOwner = this.state.ownerVehicles.find(x=> x.vehicleInfoId==e.target.value);
-        console.log(selectedOwner);
         this.setState({
             currentVehicle: {
                 engine : selectedVehicle.engine,
@@ -245,8 +248,7 @@ export class AddService extends Component {
                 mileage: selectedOwner.mileage
             },
             vId : selectedOwner.vehicleId
-        })
-    console.log(this.state.currentVehicle.make)}
+        })}
         catch(error){
             console.log(error);
         } 
@@ -298,6 +300,7 @@ export class AddService extends Component {
                 <h2 style={{ padding: "4%" }}>Add Service</h2>
                 <Form name = "myForm"
                 onSubmit={this.validateForm}>
+                
                     {this.state.user.userType === "S" &&
                     <Input style={mystyle}
                     id='selectAccount'
