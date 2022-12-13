@@ -10,6 +10,7 @@ export class ServiceLog extends Component {
         super();
         this.state = {
             servicerAccounts: [],
+            serviceLog1:[],
             user: [],
             vehicleList: [],
             serviceTypes: [],
@@ -28,7 +29,7 @@ export class ServiceLog extends Component {
         }
         this.onServiceTypeChange = this.onServiceTypeChange.bind(this);
     }
-    componentDidMount() {
+    async componentDidMount() {
         //get all current user's vehicles names,engine,etc
         fetch('api/User/GetVehicle', {
             method: 'POST',
@@ -62,7 +63,7 @@ export class ServiceLog extends Component {
                 console.log(this.state.serviceTypes);
             })
         //get all owner vehicle details
-        fetch('api/User/GetOwnerVehicles', {
+        await fetch('api/User/GetOwnerVehicles', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -75,30 +76,28 @@ export class ServiceLog extends Component {
             .then((result) => {
                 console.log('ownerVehicles');
                 this.setState({
-                    ownerVehicles: result
+                    ownerVehicles: result,
+                    servicerVehciles: result.map(a => a.vehicleId)
                 });
-                console.log(this.state.ownerVehicles);
+                console.log(this.state.servicerVehciles);
             });
         //get service logs for each vehicle
-        fetch('api/User/GetServiceLog', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
+        // fetch('api/User/GetServiceLog', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Accept': 'application/json',
+        //         'Content-Type': 'application/json'
+        //     },
             
-            body: JSON.stringify({
-                servicerId: sessionStorage.getItem('userId')
-            })
-        }).then((Response) => Response.json())
-            .then((result) => {
-                console.log(this.state.ownerVehicles.vehicleId)
-                console.log('Getting Service Logs');
-                console.log(result)
-                this.setState({
-                    serviceLogs: result
-                });
-            });
+        //     body: JSON.stringify({
+        //         servicerId: sessionStorage.getItem('userId')
+        //     })
+        // }).then((Response) => Response.json())
+        //     .then((result) => {
+        //         this.setState({
+        //             serviceLogs: result
+        //         });
+        //     });
             fetch('api/User/GetCurrentUserDetails', {
                 method: 'POST',
                 headers: {
@@ -135,12 +134,28 @@ export class ServiceLog extends Component {
                     servicerAccounts: result})
                 console.log("servicerAccounts")
                 console.log(this.state.servicerAccounts);
-            })      
+            })  
+            try{   
+        await fetch('api/User/GetServiceLog1', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                serviceVehicleId: this.state.servicerVehciles
+            })  
+        }).then((Response) => Response.json())
+            .then((result) => {
+                this.setState({
+                    serviceLogs: result
+                });
+            });} catch(error){}
         }
     onSort = (column) => (e) => {
         const direction = this.state.sort.column ? (this.state.sort.direction === 'asc' ? 'desc' : 'asc') : 'desc';
         const sortedData = this.state.serviceLogs.sort((a, b) => {
-            if (column === 'accountName') {
+            if (column === 'serviceID') {
             const nameA = a.accountName.toUpperCase(); // ignore upper and lowercase
             const nameB = b.accountName.toUpperCase(); // ignore upper and lowercase
             if (nameA < nameB) {
@@ -178,6 +193,7 @@ export class ServiceLog extends Component {
     }
     formatDate(date)
     {
+
         date = date.split('T')[0];
         const [year, month, day] = date.split('-');
         const result = [month, day, year].join('/');      
@@ -186,37 +202,11 @@ export class ServiceLog extends Component {
 
     getServicer(id)
     {
-        // console.log('OWNERVEHICLES')
-        // let ownerVehicles = this.state.ownerVehicles.map(a => a.vehicleId);
-        // console.log(ownerVehicles)
-        // fetch('api/User/GetServiceLogs1', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         serviceVehicleId: ownerVehicles
-        //     })  
-        // }).then((Response) => Response.json())
-        //     .then((result) => {
-        //         console.log('getCustomerInfo');
-        //         console.log(result);
-        //         this.setState({
-        //             user: {
-        //                 userid: result.userId,
-        //                 email: result.email,
-        //                 firstName: result.firstName,
-        //                 lastName: result.lastName,
-        //                 userType: result.userType
-        //             }
-        //         });
-        //     }); 
         try{
         var servicer = this.state.servicerAccounts.find(x=> x.userId ==id);
         return [servicer.firstName," ",servicer.lastName]
-    }
-            catch(error){console.log(error)}
+            }       
+            catch(error){}
     }
     getServiceType(log)
     {
@@ -229,7 +219,6 @@ export class ServiceLog extends Component {
             return serviceType.serviceName
         }     }
         catch(error){
-            console.log(error)
         }  
     }
 
@@ -244,11 +233,8 @@ export class ServiceLog extends Component {
             var vehicleInfoId = this.state.ownerVehicles.find(x=> x.vehicleId === vehicleId);
             var vehicleDisplayName =  this.state.vehicleList.find(x=> x.ymmId === vehicleInfoId.vehicleInfoId);
             return vehicleDisplayName.vehicleDisplayName
-            // var result = getName(vehicleInfoId.vehicleInfoId)
-            // return result
         }
         catch(error){
-            console.log(error)
         }
     }
 
@@ -264,7 +250,6 @@ export class ServiceLog extends Component {
             }
         }
         catch(error){
-            console.log(error)
         }
     }
     render() {
@@ -303,19 +288,13 @@ export class ServiceLog extends Component {
             {this.state.serviceLogs.map(log =>      
                 <tr key={log.serviceLogId}>  
                     <td>{this.formatDate(log.serviceDate)}</td> 
-                    <td>{
-                    this.getServicer(log.servicerId)
-                    //log.servicerId
-
-                    }</td> 
+                    <td>{this.getServicer(log.servicerId)}</td> 
                     <td>{this.getServiceType(log)}</td>  
                     <td>{this.getVehicleName(log.vehicleId)}</td>
                     <td>{log.currentMileage}</td>  
                     <td>{this.getServiceInterval(log)}</td>  
                     <td>{log.serviceNotes}</td>  
-
-                </tr>  
-            )}  
+                </tr> )}  
         </tbody>  
     </table>
     }

@@ -142,13 +142,13 @@ namespace MechanicsMateBackend.Services
             return serviceLogs;   
             }
         }
-        // public async Task <List<ServiceLog>> getServiceLogs1(List<int> vehicleId)
-        // {
-        //     using (var mme = new mechanics_mate_devContext()){
-        //     var serviceLogs = await (from v in mme.ServiceLogs where vehicleId.Contains(v.VehicleId)  select v).ToListAsync<ServiceLog>();
-        //     return serviceLogs;   
-        //     }
-        // }
+        public async Task <List<ServiceLog>> getServiceLogs1(List<int> vehicleId)
+        {
+            using (var mme = new mechanics_mate_devContext()){
+            var serviceLogs = await (from v in mme.ServiceLogs where vehicleId.Contains(v.VehicleId)  select v).ToListAsync<ServiceLog>();
+            return serviceLogs;   
+            }
+        }
         public async Task<ServiceResponse> AddService(ServiceLog serviceCreate)
         {
             using (var mmd = new mechanics_mate_devContext())
