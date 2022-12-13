@@ -5,6 +5,9 @@ using MechanicsMateBackend.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Net.Http.Formatting;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 
 namespace MechanicsMate.Controllers
 {
@@ -71,11 +74,15 @@ namespace MechanicsMate.Controllers
             return ownerVehicles;
         }
         [HttpPost]
+        [RequestSizeLimit(10000000)]
         [Route("AddService")]
-        public async Task<ServiceResponse> AddService([FromBody]ServiceLog serviceCreate)
+        public async Task<ServiceResponse> AddService([FromForm] IFormCollection serviceCreate)
         {
             var us = new UserService();
-            return await us.AddService(serviceCreate);
+            var service = JsonConvert.DeserializeObject<ServiceLog>(serviceCreate["serviceCreate"]);
+            var invoice = serviceCreate.Files.FirstOrDefault();
+            var invoiceStream = invoice.OpenReadStream();
+            return await us.AddService(service, invoiceStream);
         }
 
         [HttpPost]

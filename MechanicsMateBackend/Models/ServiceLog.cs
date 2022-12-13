@@ -14,7 +14,7 @@ namespace MechanicsMateBackend.Models
         public uint CurrentMileage { get; set; }
         public DateTime ServiceDate { get; set; }
         public string ServiceNotes { get; set; }
-        public string InvoicePath { get; set; }
+        public byte[] InvoicePath { get; set; }
 
         public virtual ServiceType ServiceType { get; set; }
         public virtual User Servicer { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -171,7 +172,7 @@ namespace MechanicsMateBackend.Services
             return vehicle;   
             }
         }
-        public async Task<ServiceResponse> AddService(ServiceLog serviceCreate)
+        public async Task<ServiceResponse> AddService(ServiceLog serviceCreate, Stream invoice)
         {
             using (var mmd = new mechanics_mate_devContext())
             {
@@ -184,7 +185,9 @@ namespace MechanicsMateBackend.Services
                 service.CurrentMileage = serviceCreate.CurrentMileage;
                 service.ServiceDate = serviceCreate.ServiceDate;
                 service.ServiceNotes = serviceCreate.ServiceNotes;
-                service.InvoicePath = serviceCreate.InvoicePath;
+                MemoryStream ms = new MemoryStream();
+                invoice.CopyTo(ms);
+                service.InvoicePath = ms.ToArray();
                 mmd.ServiceLogs.Add(service);
                 var vehicle = mmd.Vehicles.Where(v => v.VehicleId == serviceCreate.VehicleId).FirstOrDefault();
                 vehicle.Mileage = serviceCreate.CurrentMileage;

@@ -1,4 +1,4 @@
-﻿import React, { Component } from 'react';
+﻿import React, { Component, useRef } from 'react';
 import User from "../../Models/User";
 
 import {
@@ -6,6 +6,9 @@ import {
     Form,
     Input,
 } from 'reactstrap';
+import SessionManager from "../Auth/SessionManager";
+import '../../custom.css';
+
 var date = new Date();
 // var today = new Date().toJSON().slice(0,10);
 var today = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toJSON();
@@ -36,6 +39,9 @@ export class AddService extends Component {
         this.onServiceTypeChange = this.onServiceTypeChange.bind(this);
         this.setCustomService = this.setCustomService.bind(this);
         this.submitService = this.submitService.bind(this);
+
+        this.invoiceInput = React.createRef();
+
     }
 
     async componentDidMount() {
@@ -47,7 +53,7 @@ export class AddService extends Component {
             },
             body: JSON.stringify({
                 email: sessionStorage.getItem('userEmail')
-            })  
+            })
         }).then((Response) => Response.json())
             .then((result) => {
                 console.log('getCustomerInfo');
@@ -138,57 +144,34 @@ export class AddService extends Component {
             .then((result) => {
                 console.log(result)
                 this.setState({
-                    servicerAccounts: result})
+                    servicerAccounts: result
+                })
                 console.log("servicerAccounts2")
                 console.log(this.state.servicerAccounts);
-            })
+            });
+    }
 
-      }
-    submitService(){
-        try{
-        let customService = document.forms["myForm"]["customservice"].value;
-        if (customService === "") {
-            alert("Enter custom service name");
-            return false
-          }}
-          catch(error){console.log(error)}
-        try{
-        let customInterval = document.forms["myForm"]["custominterval"].value;
-        if (customInterval <=0) {
-            alert("Enter a valid custom interval");
-            return false
-          }}catch(error){console.log(error)}   
+    submitService() {
+        var formData = new FormData();
+        formData.append('serviceCreate', JSON.stringify({
+            ServicerId: this.state.user.userid,
+            ServiceTypeId: this.state.selectedService.servicetypeid,
+            VehicleId: this.state.vId,
+            CustomServiceName: this.state.customService,
+            CustomServiceInterval: this.state.customInterval,
+            CurrentMileage: this.state.mileage,
+            ServiceDate: this.state.date,
+            ServiceNotes: this.state.serviceNotes,
+            InvoicePath: this.state.invoicePath
+
+        }));
+        formData.append('invoice', this.invoiceInput.current.files[0]);
+        console.log(formData);
+
         console.log('Submit Service');
-        console.log(this.state.vId);
-        console.log(
-            JSON.stringify({
-                ServicerId: this.state.user.userid,
-                ServiceTypeId:this.state.selectedService.servicetypeid,   
-                VehicleId:this.state.vId,
-                CustomServiceName:this.state.customService,
-                CustomServiceInterval: this.state.customInterval,
-                ServiceDate:this.state.date,
-                ServiceNotes:this.state.serviceNotes,
-                CurrentMileage:this.state.currentVehicle.mileage,
-                InvoicePath: this.state.invoicePath
-                })
-        );
-        fetch('api/User/AddService/', {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                ServicerId: this.state.user.userid,
-                ServiceTypeId:this.state.selectedService.servicetypeid,           
-                VehicleId:this.state.vId,
-                CustomServiceName:this.state.customService,
-                CustomServiceInterval: this.state.customInterval,
-                CurrentMileage:this.state.currentVehicle.mileage,
-                ServiceDate:this.state.date,
-                ServiceNotes:this.state.serviceNotes,
-                InvoicePath: this.state.invoicePath
-            })
+        fetch('api/User/AddService', {
+            method: 'POST',
+            body: formData
         }).then((Response) => Response.text())
             .then((result) => {
                 console.log(result);});
@@ -295,6 +278,7 @@ export class AddService extends Component {
 
     }
 
+
     render(vehicleList) {
         const mystyle = {
             fontFamily: "Arial",
@@ -318,8 +302,6 @@ export class AddService extends Component {
         return (
             <div style={center}>
                 <h2 style={{ padding: "4%" }}>Add Service</h2>
-                <Form name = "myForm"
-                onSubmit={this.validateForm}>
                 
                     {this.state.user.userType === "S" &&
                     <Input style={mystyle}
@@ -387,32 +369,37 @@ export class AddService extends Component {
                     onChange={(e)=>this.setServiceNotes(e)}
                     />
 
-                    {this.state.service === "Custom Service" &&
-                        <Input
-                            style={mystyle}
-                            id='customservice'
-                            placeholder='Enter Custom Service Name'
-                            type='text' 
-                            onChange={(e) =>this.setCustomService(e)} 
-                            required
-                            />
-                        }
-                    {this.state.service === "Custom Service" &&
-                        <Input
-                            style={mystyle}
-                            id='custominterval'
-                            placeholder='Enter Custom Interval'
-                            type='number'
-                            onChange={(e) =>this.setCustomInterval(e)} 
-                            required
-                            />
-                        }
-                    <Button
-                        onClick = {this.submitService}>
-                        Submit
-                    </Button>
-                </Form>
-                
+                {this.state.service === "Custom Service" &&
+                    <Input
+                        style={mystyle}
+                        id='customservice'
+                        placeholder='Enter Custom Service Name'
+                        type='text'
+                        onChange={(e) => this.setCustomService(e)}
+                        required
+                    />
+                }
+                {this.state.service === "Custom Service" &&
+                    <Input
+                        style={mystyle}
+                        id='custominterval'
+                        placeholder='Enter Custom Interval'
+                        type='number'
+                        onChange={(e) => this.setCustomInterval(e)}
+                        required
+                    />
+                }
+                <label className="label">
+                    <input type="file" name="invoiceInput" multiple={false} ref={this.invoiceInput} />
+                    <span>Upload Invoice File</span>
+                </label>
+                <br />
+                <br/>
+                <Button
+                    onClick={() => this.submitService()}>
+                    Submit
+                </Button>
+
             </div>
                         
 

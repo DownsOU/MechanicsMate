@@ -105,7 +105,7 @@ namespace MechanicsMateBackend.Models
 
                 entity.Property(e => e.CustomServiceName).HasMaxLength(1000);
 
-                entity.Property(e => e.InvoicePath).HasMaxLength(100);
+                entity.Property(e => e.InvoicePath).HasColumnType("mediumblob");
 
                 entity.Property(e => e.ServiceDate).HasColumnType("datetime");
 
