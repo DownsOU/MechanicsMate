@@ -245,6 +245,37 @@ export class ServiceLog extends Component {
         catch(error){
         }
     }
+
+    getInvoiceFile(log)
+    {
+        fetch('api/User/GetInvoiceFile?serviceLogId='+ log.serviceLogId, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/pdf',
+            }
+        }).then(response => {
+            // check if the response is successful
+            if (response.ok) {
+                // if successful, return the file as a blob
+                return response.blob();
+            }
+        })
+            .then(blob => {
+                // do something with the file (e.g. display it in the browser)
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.style.display = "none";
+                a.href = url;
+                a.download = "invoice"+log.serviceLogId+".pdf";
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                // handle any errors
+                console.error(error);
+            });
+    }
     render() {
         var newdata = this.state.data;
         const mystyle = {
@@ -274,7 +305,8 @@ export class ServiceLog extends Component {
                 <th onClick={this.onSort('vehicleDisplayName')}> Vehicle <span className={this.setArrow('vehicleDisplayName')}></span></th>
                 <th onClick={this.onSort('currentMileage')}> Current Mileage <span className={this.setArrow('currentMileage')}></span></th>
                 <th onClick={this.onSort('serviceInterval')}> Service Interval <span className={this.setArrow('serviceInterval')}></span></th>
-                <th onClick={this.onSort('serviceNotes')}> Service Notes <span className={this.setArrow('serviceNotes')}></span></th>
+                    <th onClick={this.onSort('serviceNotes')}> Service Notes <span className={this.setArrow('serviceNotes')}></span></th>
+                    <th> Invoice File </th>
             </tr>  
         </thead>  
         <tbody>  
@@ -286,7 +318,8 @@ export class ServiceLog extends Component {
                     <td>{this.getVehicleName(log.vehicleId)}</td>
                     <td>{log.currentMileage}</td>  
                     <td>{this.getServiceInterval(log)}</td>  
-                    <td>{log.serviceNotes}</td>  
+                    <td>{log.serviceNotes}</td>
+                    <td>{log.invoicePath != null && <Button onClick={() => this.getInvoiceFile(log)}>Invoice</Button>}</td>
                 </tr> )}  
         </tbody>  
     </table>

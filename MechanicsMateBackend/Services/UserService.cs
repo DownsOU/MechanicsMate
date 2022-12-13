@@ -42,7 +42,7 @@ namespace MechanicsMateBackend.Services
                 };
             }
         }
-        
+
         public async Task<UserResponse> LoginUser(UserLogin userLogin)
         {
             using (var mmd = new mechanics_mate_devContext())
@@ -55,7 +55,7 @@ namespace MechanicsMateBackend.Services
                 else
                 {
                     var hasher = new PasswordHasher();
-                    if(!hasher.Check(user.PasswordHash, userLogin.Password))
+                    if (!hasher.Check(user.PasswordHash, userLogin.Password))
                     {
                         throw new ApplicationException("Invalid Email or Password");
                     }
@@ -78,7 +78,7 @@ namespace MechanicsMateBackend.Services
                         };
                     }
                 }
-            }  
+            }
         }
 
         public async Task<UserDetail> GetCurrentUserDetails(string email)
@@ -100,12 +100,12 @@ namespace MechanicsMateBackend.Services
         {
             using (var mmd = new mechanics_mate_devContext())
             {
-                List<ServiceType> serviceList = new List<ServiceType>();  
+                List<ServiceType> serviceList = new List<ServiceType>();
                 serviceList = await mmd.ServiceTypes.ToListAsync<ServiceType>();
                 return serviceList;
             }
         }
-        public async Task<List<int> > GetVehicle (int ownerId)
+        public async Task<List<int>> GetVehicle(int ownerId)
         {
             using (var mme = new mechanics_mate_devContext())
             {
@@ -113,63 +113,70 @@ namespace MechanicsMateBackend.Services
                 var vehicles = await (from v in mme.Vehicles where v.OwnerId == ownerId select v).ToListAsync<Vehicle>();
                 //List<int> selectedIds = new List<int>{73920154,73920264};
                 List<int> selectedIds = new List<int>();
-                selectedIds = vehicles.Select(x =>x.VehicleInfoId).ToList();
+                selectedIds = vehicles.Select(x => x.VehicleInfoId).ToList();
                 //await GetVehicleList(vehicles);
-                return selectedIds;    
+                return selectedIds;
             }
         }
-        public async Task <List<Mg1nYearMakeModelMasterAdvanced>> getVehicleList(List<int> vehicleId)
+        public async Task<List<Mg1nYearMakeModelMasterAdvanced>> getVehicleList(List<int> vehicleId)
         {
-            using (var mme = new mechanics_mate_devContext()){
-            List<Mg1nYearMakeModelMasterAdvanced> lstVehicle = new List<Mg1nYearMakeModelMasterAdvanced>();  
-            lstVehicle = await(from VehicleList in mme.Mg1nYearMakeModelMasterAdvanceds where vehicleId.Contains(VehicleList.YmmId) select VehicleList).ToListAsync<Mg1nYearMakeModelMasterAdvanced>();  
+            using (var mme = new mechanics_mate_devContext())
+            {
+                List<Mg1nYearMakeModelMasterAdvanced> lstVehicle = new List<Mg1nYearMakeModelMasterAdvanced>();
+                lstVehicle = await (from VehicleList in mme.Mg1nYearMakeModelMasterAdvanceds where vehicleId.Contains(VehicleList.YmmId) select VehicleList).ToListAsync<Mg1nYearMakeModelMasterAdvanced>();
 
-            return lstVehicle;  
+                return lstVehicle;
             }
         }
-        public async Task <List<User>> getServicerVehicles(List<int> ownerId)
+        public async Task<List<User>> getServicerVehicles(List<int> ownerId)
         {
             Console.Write("getting provider vehciles");
-            using (var mme = new mechanics_mate_devContext()){
-            var lstVehicle = await(from v in mme.Users where ownerId.Contains(v.UserId) select v).ToListAsync<User>();  
-            return lstVehicle;
+            using (var mme = new mechanics_mate_devContext())
+            {
+                var lstVehicle = await (from v in mme.Users where ownerId.Contains(v.UserId) select v).ToListAsync<User>();
+                return lstVehicle;
 
             }
         }
-        public async Task <List<Vehicle>> getOwnerVehicles(int ownerId)
+        public async Task<List<Vehicle>> getOwnerVehicles(int ownerId)
         {
-            using (var mme = new mechanics_mate_devContext()){
-            Console.WriteLine("getting Owners Vehicles");
-            var ownersVehicles = await (from v in mme.Vehicles where v.OwnerId == ownerId select v).ToListAsync<Vehicle>();
-            return ownersVehicles;   
-            }   
-        }
-        public async Task <List<ServiceLog>> getServiceLogs(int ownerId)
-        {
-            using (var mme = new mechanics_mate_devContext()){
-            var serviceLogs = await (from v in mme.ServiceLogs where v.ServicerId == ownerId select v).ToListAsync<ServiceLog>();
-            return serviceLogs;   
+            using (var mme = new mechanics_mate_devContext())
+            {
+                Console.WriteLine("getting Owners Vehicles");
+                var ownersVehicles = await (from v in mme.Vehicles where v.OwnerId == ownerId select v).ToListAsync<Vehicle>();
+                return ownersVehicles;
             }
         }
-        public async Task <List<UserAccess>> getServicerAccess(int ownerId)
+        public async Task<List<ServiceLog>> getServiceLogs(int ownerId)
         {
-            using (var mme = new mechanics_mate_devContext()){
-            var serviceLogs = await (from v in mme.UserAccesses where ownerId ==v.ServiceProviderId select v).ToListAsync<UserAccess>();
-            return serviceLogs;   
+            using (var mme = new mechanics_mate_devContext())
+            {
+                var serviceLogs = await (from v in mme.ServiceLogs where v.ServicerId == ownerId select v).ToListAsync<ServiceLog>();
+                return serviceLogs;
             }
         }
-        public async Task <List<ServiceLog>> getServiceLogs1(List<int> vehicleId)
+        public async Task<List<UserAccess>> getServicerAccess(int ownerId)
         {
-            using (var mme = new mechanics_mate_devContext()){
-            var serviceLogs = await (from v in mme.ServiceLogs where vehicleId.Contains(v.VehicleId)  select v).ToListAsync<ServiceLog>();
-            return serviceLogs;   
+            using (var mme = new mechanics_mate_devContext())
+            {
+                var serviceLogs = await (from v in mme.UserAccesses where ownerId == v.ServiceProviderId select v).ToListAsync<UserAccess>();
+                return serviceLogs;
             }
         }
-        public async Task <Vehicle> ymmToVehicleId(int ymm)
+        public async Task<List<ServiceLog>> getServiceLogs1(List<int> vehicleId)
         {
-            using (var mme = new mechanics_mate_devContext()){
-            var vehicle = await (from v in mme.Vehicles where ymm ==v.VehicleInfoId select v).FirstOrDefaultAsync();
-            return vehicle;   
+            using (var mme = new mechanics_mate_devContext())
+            {
+                var serviceLogs = await (from v in mme.ServiceLogs where vehicleId.Contains(v.VehicleId) select v).ToListAsync<ServiceLog>();
+                return serviceLogs;
+            }
+        }
+        public async Task<Vehicle> ymmToVehicleId(int ymm)
+        {
+            using (var mme = new mechanics_mate_devContext())
+            {
+                var vehicle = await (from v in mme.Vehicles where ymm == v.VehicleInfoId select v).FirstOrDefaultAsync();
+                return vehicle;
             }
         }
         public async Task<ServiceResponse> AddService(ServiceLog serviceCreate, Stream invoice)
@@ -215,7 +222,7 @@ namespace MechanicsMateBackend.Services
             {
                 var requestedUser = await mmd.Users.Where(u => u.Email == request.RequestedUserEmail).FirstOrDefaultAsync();
                 var emailList = await mmd.Users.Select(u => u.Email).Distinct().ToListAsync();
-                if(requestedUser == null)
+                if (requestedUser == null)
                 {
                     throw new ApplicationException("User not found");
                 }
@@ -237,13 +244,13 @@ namespace MechanicsMateBackend.Services
                 var pendingRequestList = new List<PendingRequest>();
                 var requestsFromDB = await mmd.UserAccesses.Where(ua => ua.VehicleOwnerId == userId && ua.RequestStatus == (int)RequestStatus.Pending)
                     .Include(ua => ua.ServiceProvider).ToListAsync();
-                foreach(var request in requestsFromDB)
+                foreach (var request in requestsFromDB)
                 {
                     pendingRequestList.Add(new PendingRequest
                     {
                         ServiceProviderId = request.ServiceProviderId,
                         VehicleOwnerID = request.VehicleOwnerId,
-                        ServiceProviderName = request.ServiceProvider.FirstName + " " +request.ServiceProvider.LastName
+                        ServiceProviderName = request.ServiceProvider.FirstName + " " + request.ServiceProvider.LastName
                     });
                 }
                 return pendingRequestList;
@@ -277,12 +284,12 @@ namespace MechanicsMateBackend.Services
                         .Include(sl => sl.Servicer).ToListAsync();
                 }
                 var serviceNotificationList = new List<ServiceNotification>();
-                foreach(var userService in userServiceLogList)
+                foreach (var userService in userServiceLogList)
                 {
-                    if(userService.ServiceTypeId.HasValue || userService.CustomServiceInterval != 0)
+                    if (userService.ServiceTypeId.HasValue || userService.CustomServiceInterval != 0)
                     {
                         uint nextServiceMileage = 0;
-                        if (userService.ServiceType.ServiceName != "Custom Service") 
+                        if (userService.ServiceType.ServiceName != "Custom Service")
                         {
                             nextServiceMileage = userService.Vehicle.Mileage + userService.ServiceType.ServiceInterval.GetValueOrDefault();
                         }
@@ -300,12 +307,13 @@ namespace MechanicsMateBackend.Services
 
                         if (estimatedMileageRemaining <= 100)
                         {
-                            serviceNotificationList.Add(new ServiceNotification {
+                            serviceNotificationList.Add(new ServiceNotification
+                            {
                                 ServiceName = userService.CustomServiceName ?? userService.ServiceType.ServiceName,
                                 EstimatedMileageRemaining = estimatedMileageRemaining.GetValueOrDefault(),
                                 OwnerEmail = userService.Vehicle.Owner.Email,
                                 ServicerEmail = userService.Servicer.Email
-                            }) ;
+                            });
                         }
                     }
                 }
@@ -357,6 +365,15 @@ namespace MechanicsMateBackend.Services
                     });
                 }
                 return providerList;
+            }
+        }
+
+        public async Task<byte[]> GetInvoiceFile(int serviceLogId)
+        {
+            using (var mmd = new mechanics_mate_devContext())
+            {
+                var log = await mmd.ServiceLogs.Where(l => l.ServiceLogId == serviceLogId).FirstOrDefaultAsync();
+                return log.InvoicePath;
             }
         }
     }

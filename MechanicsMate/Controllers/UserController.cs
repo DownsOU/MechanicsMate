@@ -38,11 +38,11 @@ namespace MechanicsMate.Controllers
     [EnableCors("CorsPolicy")]
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController: ControllerBase
+    public class UserController : ControllerBase
     {
         [HttpPost]
         [Route("AddUser")]
-        public async Task<UserResponse> AddUser([FromBody]UserCreate userCreate)
+        public async Task<UserResponse> AddUser([FromBody] UserCreate userCreate)
         {
             var us = new UserService();
             return await us.AddUser(userCreate);
@@ -50,27 +50,27 @@ namespace MechanicsMate.Controllers
 
         [HttpPost]
         [Route("LoginUser")]
-        public async Task<UserResponse> LoginUser([FromBody]UserLogin userLogin)
+        public async Task<UserResponse> LoginUser([FromBody] UserLogin userLogin)
         {
             var us = new UserService();
             return await us.LoginUser(userLogin);
         }
         [HttpPost]
         [Route("GetVehicle")]
-        public async Task <List<Mg1nYearMakeModelMasterAdvanced>>  GetVehicle([FromBody] VehicleObject vehicleobj)
+        public async Task<List<Mg1nYearMakeModelMasterAdvanced>> GetVehicle([FromBody] VehicleObject vehicleobj)
         {
             var us = new UserService();
-            var vehicleIds =  await us.GetVehicle(vehicleobj.ownerId);
+            var vehicleIds = await us.GetVehicle(vehicleobj.ownerId);
             //var y = new List<int> {73920264,73920154};
             var vehicleList = await us.getVehicleList(vehicleIds);
             return vehicleList;
         }
         [HttpPost]
         [Route("GetOwnerVehicles")]
-        public async Task <List<Vehicle>>  GetOwnerVehicles([FromBody] VehicleObject vehicleobj)
+        public async Task<List<Vehicle>> GetOwnerVehicles([FromBody] VehicleObject vehicleobj)
         {
             var us = new UserService();
-            var ownerVehicles =  await us.getOwnerVehicles(vehicleobj.ownerId);
+            var ownerVehicles = await us.getOwnerVehicles(vehicleobj.ownerId);
             return ownerVehicles;
         }
         [HttpPost]
@@ -108,37 +108,37 @@ namespace MechanicsMate.Controllers
         }
         [HttpPost]
         [Route("GetServiceLog")]
-        public async Task <List<ServiceLog>>  GetServiceLogs([FromBody] ServiceObject vehicleobj)
+        public async Task<List<ServiceLog>> GetServiceLogs([FromBody] ServiceObject vehicleobj)
         {
             var us = new UserService();
-            var serviceLogs =  await us.getServiceLogs(vehicleobj.servicerId);
+            var serviceLogs = await us.getServiceLogs(vehicleobj.servicerId);
             return serviceLogs;
         }
         [HttpPost]
         [Route("GetServiceLog1")]
-        public async Task <List<ServiceLog>>  GetServiceLogs1([FromBody] ServiceVehiclesObject vehicleobj)
+        public async Task<List<ServiceLog>> GetServiceLogs1([FromBody] ServiceVehiclesObject vehicleobj)
         {
             var us = new UserService();
-            var serviceLogs =  await us.getServiceLogs1(vehicleobj.serviceVehicleId);
+            var serviceLogs = await us.getServiceLogs1(vehicleobj.serviceVehicleId);
             return serviceLogs;
         }
         [HttpPost]
         [Route("GetServicerVehicles")]
-        public async Task <List<User>>  GetServicerVehicles([FromBody] ServiceVehiclesObject vehicleobj)
+        public async Task<List<User>> GetServicerVehicles([FromBody] ServiceVehiclesObject vehicleobj)
         {
             var us = new UserService();
-            var servicerVehicles =  await us.getServicerVehicles(vehicleobj.serviceVehicleId);
+            var servicerVehicles = await us.getServicerVehicles(vehicleobj.serviceVehicleId);
             return servicerVehicles;
         }
         [HttpPost]
         [Route("GetServicerAccess")]
-        public async Task <List<UserAccess>>  GetServicerAccess([FromBody] ServicerAccessObject accessobj)
+        public async Task<List<UserAccess>> GetServicerAccess([FromBody] ServicerAccessObject accessobj)
         {
             var us = new UserService();
-            var servicerAccess =  await us.getServicerAccess(accessobj.servicerAccess);
+            var servicerAccess = await us.getServicerAccess(accessobj.servicerAccess);
             return servicerAccess;
         }
-        
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         [Route("DeleteCurrentUser")]
@@ -188,6 +188,15 @@ namespace MechanicsMate.Controllers
         {
             var us = new UserService();
             return await us.GetServiceProviderList();
+        }
+
+        [HttpGet]
+        [Route("GetInvoiceFile")]
+        public async Task<IActionResult> GetInvoiceFile(int serviceLogId)
+        {
+            var us = new UserService();
+            var invoiceBytes = await us.GetInvoiceFile(serviceLogId);
+            return new FileContentResult(invoiceBytes, "application/pdf");
         }
     }
 }

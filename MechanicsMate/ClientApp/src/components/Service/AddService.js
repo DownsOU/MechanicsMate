@@ -33,7 +33,8 @@ export class AddService extends Component {
             ownerVehicles:[],
             invoicePath:"",
             vId: 0,
-            ownerId:0
+            ownerId: 0,
+            mileage:0
 
         }
         this.onServiceTypeChange = this.onServiceTypeChange.bind(this);
@@ -175,7 +176,8 @@ export class AddService extends Component {
         }).then((Response) => Response.text())
             .then((result) => {
                 console.log(result);});
-        alert("Service Successfully added")
+        alert("Service Successfully added");
+        window.location.reload();
     }
     setServiceNotes(e){
         this.setState({serviceNotes:e.target.value})
@@ -192,6 +194,10 @@ export class AddService extends Component {
     }
     setCustomInterval(e) {
         this.setState({ customInterval: e.target.value });
+    }
+
+    setMileage(e) {
+        this.setState({ mileage: e.target.value})
     }
     setServiceType(e){
         console.log(this.state.servicerAccounts)
@@ -360,14 +366,25 @@ export class AddService extends Component {
                         <option>
                             Custom Service
                         </option>
-                    </Input>
+                </Input>
+
+                <Input style={mystyle}
+                    id="mileage"
+                    placeholder="Current Mileage"
+                    type="number"
+                    onChange={(e) => this.setMileage(e)}
+                    required
+                />
+
                     <Input
                     style={mystyle}
                     id='servicenotes'
                     placeholder='Enter Service Notes'
                     type='text'
                     onChange={(e)=>this.setServiceNotes(e)}
-                    />
+                />
+
+                
 
                 {this.state.service === "Custom Service" &&
                     <Input
