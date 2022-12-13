@@ -98,23 +98,25 @@ export class Notification extends Component {
     render() {
         return (
             <div>
-                <h5>Pending Service Provider Access Requests:</h5>
-                {this.state.requests.map(request => {
-                    return (
-                        <div>
-                            <br />
-                            <div style={{ display: "inline-block" }}>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                {request.serviceProviderName}
-                                &nbsp;
-                                <Button onClick={() => this.approveRequest(request)}>Accept</Button>
-                                &nbsp;
-                                <Button onClick={() => this.rejectRequest(request)}>Reject</Button>
-                            </div>
-                            <br />
-                        </div>
-                    );
-                })}
+                {sessionStorage.getItem('userType') === 'O' &&
+                    <div>
+                        <h5>Pending Service Provider Access Requests:</h5>
+                        {this.state.requests.map(request => {
+                            return (
+                                <div>
+                                    <br />
+                                    <div style={{ display: "inline-block" }}>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        {request.serviceProviderName}
+                                        &nbsp;
+                                        <Button onClick={() => this.approveRequest(request)}>Accept</Button>
+                                        &nbsp;
+                                        <Button onClick={() => this.rejectRequest(request)}>Reject</Button>
+                                    </div>
+                                    <br />
+                                </div>
+                            );
+                        })}</div>}
                 <br />
                 <h5>Upcoming Services:</h5>
                 {this.state.serviceNotifications.map(service => {
