@@ -125,7 +125,15 @@ namespace MechanicsMateBackend.Services
 
             return lstVehicle;  
             }
+        }
+        public async Task <List<User>> getServicerVehicles(List<int> ownerId)
+        {
+            Console.Write("getting provider vehciles");
+            using (var mme = new mechanics_mate_devContext()){
+            var lstVehicle = await(from v in mme.Users where ownerId.Contains(v.UserId) select v).ToListAsync<User>();  
+            return lstVehicle;
 
+            }
         }
         public async Task <List<Vehicle>> getOwnerVehicles(int ownerId)
         {
@@ -140,6 +148,27 @@ namespace MechanicsMateBackend.Services
             using (var mme = new mechanics_mate_devContext()){
             var serviceLogs = await (from v in mme.ServiceLogs where v.ServicerId == ownerId select v).ToListAsync<ServiceLog>();
             return serviceLogs;   
+            }
+        }
+        public async Task <List<UserAccess>> getServicerAccess(int ownerId)
+        {
+            using (var mme = new mechanics_mate_devContext()){
+            var serviceLogs = await (from v in mme.UserAccesses where ownerId ==v.ServiceProviderId select v).ToListAsync<UserAccess>();
+            return serviceLogs;   
+            }
+        }
+        public async Task <List<ServiceLog>> getServiceLogs1(List<int> vehicleId)
+        {
+            using (var mme = new mechanics_mate_devContext()){
+            var serviceLogs = await (from v in mme.ServiceLogs where vehicleId.Contains(v.VehicleId)  select v).ToListAsync<ServiceLog>();
+            return serviceLogs;   
+            }
+        }
+        public async Task <Vehicle> ymmToVehicleId(int ymm)
+        {
+            using (var mme = new mechanics_mate_devContext()){
+            var vehicle = await (from v in mme.Vehicles where ymm ==v.VehicleInfoId select v).FirstOrDefaultAsync();
+            return vehicle;   
             }
         }
         public async Task<ServiceResponse> AddService(ServiceLog serviceCreate)
@@ -280,11 +309,6 @@ namespace MechanicsMateBackend.Services
                 return serviceNotificationList;
             }
         }
-
-        //public async Task<List<ServiceNotification>> GetServiceNotifications(List<int> ownerIds)
-        //{
-
-        //}
 
         public async Task<string> ApproveOrRejectRequest(ApproveRejectAccess approveReject)
         {
