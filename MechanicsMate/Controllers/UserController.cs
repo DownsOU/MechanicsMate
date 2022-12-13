@@ -24,6 +24,10 @@ namespace MechanicsMate.Controllers
     {
         public List<int> serviceVehicleId{get;set;}
     }
+    public class ServicerAccessObject
+    {
+        public int servicerAccess{get;set;}
+    }
     [EnableCors("CorsPolicy")]
     [ApiController]
     [Route("api/[controller]")]
@@ -102,12 +106,21 @@ namespace MechanicsMate.Controllers
         }
         [HttpPost]
         [Route("GetServicerVehicles")]
-        public async Task <List<User>>  GetServicerVehicles()
+        public async Task <List<User>>  GetServicerVehicles([FromBody] ServiceVehiclesObject vehicleobj)
         {
             var us = new UserService();
-            var servicerVehicles =  await us.getServicerVehicles();
+            var servicerVehicles =  await us.getServicerVehicles(vehicleobj.serviceVehicleId);
             return servicerVehicles;
         }
+        [HttpPost]
+        [Route("GetServicerAccess")]
+        public async Task <List<UserAccess>>  GetServicerAccess([FromBody] ServicerAccessObject accessobj)
+        {
+            var us = new UserService();
+            var servicerAccess =  await us.getServicerAccess(accessobj.servicerAccess);
+            return servicerAccess;
+        }
+        
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         [Route("DeleteCurrentUser")]

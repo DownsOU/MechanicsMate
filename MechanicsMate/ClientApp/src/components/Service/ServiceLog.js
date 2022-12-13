@@ -5,10 +5,12 @@ import {
     Form,
     Input,
 } from 'reactstrap';
+
 export class ServiceLog extends Component {
     constructor(props) {
         super();
         this.state = {
+            servicerIds:[],
             servicerAccounts: [],
             serviceLog1:[],
             user: [],
@@ -81,52 +83,58 @@ export class ServiceLog extends Component {
                 });
                 console.log(this.state.servicerVehciles);
             });
-        //get service logs for each vehicle
-        // fetch('api/User/GetServiceLog', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json'
-        //     },
-            
-        //     body: JSON.stringify({
-        //         servicerId: sessionStorage.getItem('userId')
-        //     })
-        // }).then((Response) => Response.json())
-        //     .then((result) => {
-        //         this.setState({
-        //             serviceLogs: result
-        //         });
-        //     });
-            fetch('api/User/GetCurrentUserDetails', {
+        try{   
+            await fetch('api/User/GetServiceLog1', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: sessionStorage.getItem('userEmail')
+                    serviceVehicleId: this.state.servicerVehciles
                 })  
             }).then((Response) => Response.json())
                 .then((result) => {
-                    console.log('getCustomerInfo');
-                    console.log(result);
                     this.setState({
-                        user: {
-                            userid: result.userId,
-                            email: result.email,
-                            firstName: result.firstName,
-                            lastName: result.lastName,
-                            userType: result.userType
-                        }
+                        serviceLogs: result,
+                        servicerIds: result.map(a => a.servicerId)
                     });
-                }); 
-        fetch('api/User/GetServicerVehicles', {
+                });
+                console.log('servicelogs')
+                console.log(this.state.servicerIds)
+            } catch(error){}
+        fetch('api/User/GetCurrentUserDetails', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
+            body: JSON.stringify({
+                email: sessionStorage.getItem('userEmail')
+            })  
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log('getCustomerInfo');
+                console.log(result);
+                this.setState({
+                    user: {
+                        userid: result.userId,
+                        email: result.email,
+                        firstName: result.firstName,
+                        lastName: result.lastName,
+                        userType: result.userType
+                    }
+                });
+            }); 
+        await fetch('api/User/GetServicerVehicles', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                serviceVehicleId: this.state.servicerIds
+            }) 
         }).then((Response) => Response.json())
             .then((result) => {
                 console.log(result)
@@ -135,22 +143,7 @@ export class ServiceLog extends Component {
                 console.log("servicerAccounts")
                 console.log(this.state.servicerAccounts);
             })  
-            try{   
-        await fetch('api/User/GetServiceLog1', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                serviceVehicleId: this.state.servicerVehciles
-            })  
-        }).then((Response) => Response.json())
-            .then((result) => {
-                this.setState({
-                    serviceLogs: result
-                });
-            });} catch(error){}
+
         }
     onSort = (column) => (e) => {
         const direction = this.state.sort.column ? (this.state.sort.direction === 'asc' ? 'desc' : 'asc') : 'desc';
