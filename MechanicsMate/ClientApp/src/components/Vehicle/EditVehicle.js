@@ -12,7 +12,7 @@ export class EditVehicle extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            role= sessionStorage.getItem('userType'),
+            role: sessionStorage.getItem('userType'),
             carList: [],
             data: false,
             vName: '',
