@@ -16,7 +16,7 @@ namespace MechanicsMateBackend.Models
         /// <summary>
         /// YMM ID
         /// </summary>
-        public ulong YmmId { get; set; }
+        public int YmmId { get; set; }
         /// <summary>
         /// Make
         /// </summary>

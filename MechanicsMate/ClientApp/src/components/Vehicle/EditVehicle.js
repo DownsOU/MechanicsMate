@@ -57,28 +57,28 @@ export class EditVehicle extends Component {
                 })
         }
         else {
-            fetch('api/Vehicle/GetAllCar', {
-                method: 'POST',
-                headers: {
-                    "access-control-allow-origin": "*",
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + SessionManager.getToken()
-                },
-                body: JSON.stringify({
+        fetch('api/Vehicle/GetAllCar', {
+            method: 'POST',
+            headers: {
+                "access-control-allow-origin": "*",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SessionManager.getToken()
+            },
+            body: JSON.stringify({
                     uid: this.state.cid
+            })
+        }).then((Response) => Response.json())
+            .then((result) => {
+                console.log(result);
+                this.setState({
+                    carList: result
+                });
+                this.setState({
+                    carList: this.state.carList.sort()
                 })
-            }).then((Response) => Response.json())
-                .then((result) => {
-                    console.log(result);
-                    this.setState({
-                        carList: result
-                    });
-                    this.setState({
-                        carList: this.state.carList.sort()
-                    })
-                })
-        }
+            })
+    }
     }
 
     getDetails() {
@@ -182,7 +182,7 @@ export class EditVehicle extends Component {
                 console.log(result);
                 this.setState({
                     carList: result
-                });
+            });
                 this.setState({
                     carList: this.state.carList.sort()
                 })

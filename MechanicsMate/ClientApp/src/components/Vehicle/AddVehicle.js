@@ -63,25 +63,25 @@ export class AddVehicle extends Component {
                 })
         }
         
-            fetch('api/Vehicle/GetAllMakes', {
-                method: 'GET',
-                headers: {
-                    "access-control-allow-origin": "*",
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + SessionManager.getToken()
-                }
-            }).then((Response) => Response.json())
-                .then((result) => {
+        fetch('api/Vehicle/GetAllMakes', {
+            method: 'GET',
+            headers: {
+                "access-control-allow-origin": "*",
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SessionManager.getToken()
+            }
+        }).then((Response) => Response.json())
+            .then((result) => {
 
-                    this.setState({
-                        makelist: result
-                    });
-                    this.setState({
-                        makelist: this.state.makelist.sort()
-                    })
+                this.setState({
+                    makelist: result
+                });
+                this.setState({
+                    makelist: this.state.makelist.sort()
                 })
-        
+            })
+
 
     }
 
@@ -321,7 +321,7 @@ export class AddVehicle extends Component {
                         ))}
                     </Input>
                     }
-                    
+
                     <Input style={mystyle}
                         id='vehicleMake'
                         type='select'
