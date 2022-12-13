@@ -193,7 +193,7 @@ export class DeleteVehicle extends Component {
 
         return (
             <div style={center}>
-                <h2 style={{ padding: "4%" }}>Welcom to Mechanics Mate</h2>
+                <h2 style={{ padding: "4%" }}>Delete Vehicle</h2>
                 <Form>
                     {this.state.role == 'S' &&
                         <Input style={mystyle}

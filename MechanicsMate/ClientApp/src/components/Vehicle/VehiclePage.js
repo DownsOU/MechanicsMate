@@ -31,7 +31,7 @@ export class VehiclePage extends Component {
         };
         return (
             <div style={center}>
-                <h2 style={{ padding: "4%" }}>Welcom to Mechanics Mate</h2>
+                <h2 style={{ padding: "4%" }}>Vehicle Operations</h2>
                 <Form>
 
                     <Button href="/add-vehicle" style={{ padding: "2%" }}>
